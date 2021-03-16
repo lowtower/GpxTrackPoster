@@ -183,7 +183,7 @@ def main() -> None:
         metavar="DISTANCE",
         type=float,
         default=20.0,
-        help="Special Distance2 by km and corlor with the special_color2",
+        help="Special Distance2 by km and color with the special_color2",
     )
     args_parser.add_argument(
         "--min-distance",
