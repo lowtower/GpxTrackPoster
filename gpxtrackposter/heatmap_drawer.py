@@ -7,6 +7,7 @@
 import argparse
 import logging
 import math
+import os
 import typing
 import uuid
 
@@ -202,6 +203,10 @@ class HeatmapDrawer(TracksDrawer):
             tmp_file = str(uuid.uuid4()) + ".png"
             img_res = image.crop((left, top, right, bottom))
             img_res.save(tmp_file)
-            g.add(dr.image(tmp_file, insert=(offset.x, offset.y), size=(size.x, size.y)))
+            with open(tmp_file, "rb") as f:
+                img_tmp = f.read()
+            img_inl = staticmaps.SvgRenderer.create_inline_image(img_tmp)
+            dr.add(dr.image(img_inl, insert=(offset.x, offset.y), size=(size.x, size.y)))
+            os.remove(tmp_file)
         except (Image.DecompressionBombError, FileNotFoundError):
             print("Something went wrong!")
