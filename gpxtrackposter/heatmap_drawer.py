@@ -209,4 +209,4 @@ class HeatmapDrawer(TracksDrawer):
             dr.add(dr.image(img_inl, insert=(offset.x, offset.y), size=(size.x, size.y)))
             os.remove(tmp_file)
         except (Image.DecompressionBombError, FileNotFoundError):
-            print("Something went wrong!")
+            print("Something went wrong generating the background image!")
