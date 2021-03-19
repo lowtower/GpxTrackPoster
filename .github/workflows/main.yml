@@ -20,7 +20,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
-        git clone -b add-object-independent-bounds https://github.com/flopp/py-staticmaps.git temp_dir
+        git clone https://github.com/flopp/py-staticmaps.git temp_dir
         cd temp_dir
         pip install .
         cd -
