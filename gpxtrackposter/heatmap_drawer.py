@@ -68,7 +68,7 @@ class HeatmapDrawer(TracksDrawer):
             metavar="TILEPROVIDER",
             type=str,
             choices=staticmaps.default_tile_providers.keys(),
-            help="Optionally, chose a tile provider from the list for a background map image.",
+            help="Optionally, choose a tile provider from the list for a background map image.",
         )
 
     def fetch_args(self, args: argparse.Namespace) -> None:
