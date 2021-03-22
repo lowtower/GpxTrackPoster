@@ -151,7 +151,7 @@ class Poster:
                 continue
             text_date = track.start_time().strftime("%Y-%m-%d")
             year = track.start_time().year
-            if not text_date in self.tracks_by_date:
+            if text_date not in self.tracks_by_date:
                 self.year_tracks_date_count_dict[year] += 1
             self.tracks_by_date[text_date].append(track)
             self.length_range.extend(track.length())
