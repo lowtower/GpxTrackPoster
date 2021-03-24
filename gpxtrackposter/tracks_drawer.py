@@ -9,10 +9,10 @@ import argparse
 import pint  # type: ignore
 import svgwrite  # type: ignore
 
+from gpxtrackposter import utils
 from gpxtrackposter.poster import Poster
 from gpxtrackposter.quantity_range import QuantityRange
 from gpxtrackposter.xy import XY
-from gpxtrackposter import utils
 
 
 class TracksDrawer:
@@ -26,6 +26,10 @@ class TracksDrawer:
 
     def fetch_args(self, args: argparse.Namespace) -> None:
         pass
+
+    def draw_background(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
+        """Draw background for all poster types - black rectangle"""
+        g.add(dr.rect((offset.x, offset.y), (size.x, size.y), fill=self.poster.colors["background"]))
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
         pass
