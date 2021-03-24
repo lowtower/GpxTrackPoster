@@ -7,12 +7,17 @@
 import argparse
 import logging
 import math
+import os
+import uuid
 from typing import Dict, List, Optional, Tuple
 
 import s2sphere  # type: ignore
+import staticmaps  # type: ignore
 import svgwrite  # type: ignore
-from geopy.distance import distance  # type: ignore
 
+from PIL import Image  # type: ignore
+
+from geopy.distance import distance  # type: ignore
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import ParameterError
 from gpxtrackposter.poster import Poster
@@ -45,6 +50,9 @@ class HeatmapDrawer(TracksDrawer):
         self._heatmap_line_width_lower: List[Tuple[float, float]] = [(0.10, 5.0), (0.20, 2.0), (1.0, 0.30)]
         self._heatmap_line_width_upper: List[Tuple[float, float]] = [(0.02, 0.5), (0.05, 0.2), (1.0, 0.05)]
         self._heatmap_line_width: Optional[List[Tuple[float, float]]] = self._heatmap_line_width_lower
+        self._tile_provider: Optional[staticmaps.TileProvider] = None
+        self._tile_context: staticmaps.Context = staticmaps.Context()
+        self._bg_max_size: int = 1024
 
     def create_args(self, args_parser: argparse.ArgumentParser) -> None:
         group = args_parser.add_argument_group("Heatmap Type Options")
@@ -70,6 +78,14 @@ class HeatmapDrawer(TracksDrawer):
             type=str,
             help="Define three transparency and width tuples for the heatmap lines or set it to "
             "`automatic` for automatic calculation (default: 0.1,5.0, 0.2,2.0, 1.0,0.3).",
+        )
+        group.add_argument(
+            "--heatmap-tile-provider",
+            dest="heatmap_tile_provider",
+            metavar="TILEPROVIDER",
+            type=str,
+            choices=staticmaps.default_tile_providers.keys(),
+            help="Optionally, choose a tile provider from the list for a background map image.",
         )
 
     # pylint: disable=too-many-branches
@@ -122,6 +138,8 @@ class HeatmapDrawer(TracksDrawer):
                         self._heatmap_line_width.append((transparency, width))
                 except ValueError as e:
                     raise ParameterError(f"Not three valid TRANSPARENCY,WIDTH pairs: {args.heatmap_line_width}") from e
+        if args.heatmap_tile_provider:
+            self._tile_provider = args.heatmap_tile_provider
 
     def _get_line_transparencies_and_widths(self, bbox: s2sphere.sphere.LatLngRect) -> List[Tuple[float, float]]:
         if self._heatmap_line_width:
@@ -185,6 +203,7 @@ class HeatmapDrawer(TracksDrawer):
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
         """Draw the heatmap based on tracks."""
+        size, offset = self._get_tracks_width_height_offset(size, offset)
         bbox = self._determine_bbox()
         line_transparencies_and_widths = self._get_line_transparencies_and_widths(bbox)
         year_groups: Dict[int, svgwrite.container.Group] = {}
@@ -210,3 +229,63 @@ class HeatmapDrawer(TracksDrawer):
                             stroke_linecap="round",
                         )
                     )
+
+    def draw_background(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
+        super().draw_background(dr, g, size, offset)
+        if not self._tile_provider:
+            return
+
+        # retrieve static map
+        bbox = self._determine_bbox()
+        self._tile_context.set_tile_provider(staticmaps.default_tile_providers[self._tile_provider])
+        self._tile_context.set_center(bbox.get_center())
+        self._tile_context.add_bounds(bbox)
+        # remove padding from poster size to retrieve background image size
+        size = size - XY(
+            self.poster.padding["l"] + self.poster.padding["r"], self.poster.padding["t"] + self.poster.padding["b"]
+        )
+        offset = offset + XY(self.poster.padding["l"], self.poster.padding["t"])
+        bg_size = self._get_bg_size(size)
+
+        image = self._tile_context.render_pillow(int(bg_size.x), int(bg_size.y))
+        try:
+            tmp_file = str(uuid.uuid4()) + ".png"
+            image.save(tmp_file)
+            with open(tmp_file, "rb") as f:
+                img_tmp = f.read()
+            img_inl = staticmaps.SvgRenderer.create_inline_image(img_tmp)
+            dr.add(dr.image(img_inl, insert=(offset.x, offset.y), size=(size.x, size.y)))
+            os.remove(tmp_file)
+        except (Image.DecompressionBombError, FileNotFoundError):
+            print("Something went wrong generating the background image!")
+
+    def _get_bg_size(self, size: XY) -> XY:
+        if size.x > size.y:
+            width = self._bg_max_size
+            height = int(width * size.y / size.x)
+        else:
+            height = self._bg_max_size
+            width = int(height * size.x / size.y)
+        return XY(width, height)
+
+    def _get_tracks_width_height_offset(self, size: XY, offset: XY) -> Tuple[XY, XY]:
+        bg_size = self._get_bg_size(size)
+        scale = XY(size.x / bg_size.x, size.y / bg_size.y)
+        center, zoom = self._tile_context.determine_center_zoom(int(bg_size.x), int(bg_size.y))
+        transformer = staticmaps.Transformer(
+            int(bg_size.x),
+            int(bg_size.y),
+            zoom,
+            center,
+            staticmaps.default_tile_providers[self._tile_provider].tile_size(),
+        )
+        bbox = self._determine_bbox()
+        tr_width = math.fabs(transformer.ll2pixel(bbox.hi())[0] - transformer.ll2pixel(bbox.lo())[0])
+        tr_height = math.fabs(transformer.ll2pixel(bbox.hi())[1] - transformer.ll2pixel(bbox.lo())[1])
+        tr_size = XY(int(scale.x * tr_width), int(scale.y * tr_height))
+        stroke = 0.0
+        tr_offset_x = stroke + offset.x + scale.x * transformer.ll2pixel(bbox.lo())[0]
+        tr_offset_y = stroke + offset.y + scale.y * transformer.ll2pixel(bbox.hi())[1]
+        tr_offset = XY(int(tr_offset_x), int(tr_offset_y))
+
+        return tr_size, tr_offset
