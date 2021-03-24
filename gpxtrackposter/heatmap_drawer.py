@@ -269,6 +269,8 @@ class HeatmapDrawer(TracksDrawer):
         return XY(width, height)
 
     def _get_tracks_width_height_offset(self, size: XY, offset: XY) -> Tuple[XY, XY]:
+        if not self._tile_provider:
+            return size, offset
         bg_size = self._get_bg_size(size)
         scale = XY(size.x / bg_size.x, size.y / bg_size.y)
         center, zoom = self._tile_context.determine_center_zoom(int(bg_size.x), int(bg_size.y))
