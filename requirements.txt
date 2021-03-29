@@ -8,5 +8,5 @@ svgwrite>=1.1.9
 stravalib~=0.10
 polyline
 timezonefinder
-py-staticmaps
+py-staticmaps>=0.4
 PILLOW
