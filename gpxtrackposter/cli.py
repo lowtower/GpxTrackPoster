@@ -14,7 +14,7 @@ import appdirs  # type: ignore
 
 from gpxtrackposter import poster, track_loader
 from gpxtrackposter import grid_drawer, circular_drawer, heatmap_drawer
-from gpxtrackposter import github_drawer, calendar_drawer
+from gpxtrackposter import github_drawer, calendar_drawer, clock_drawer
 from gpxtrackposter.exceptions import ParameterError, PosterError
 from gpxtrackposter.units import Units
 
@@ -33,6 +33,7 @@ def main() -> None:
         "heatmap": heatmap_drawer.HeatmapDrawer(p),
         "circular": circular_drawer.CircularDrawer(p),
         "github": github_drawer.GithubDrawer(p),
+        "clock": clock_drawer.ClockDrawer(p),
     }
 
     args_parser = argparse.ArgumentParser(prog=__app_name__)
