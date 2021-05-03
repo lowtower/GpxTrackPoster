@@ -17,7 +17,6 @@ from gpxtrackposter.exceptions import PosterError
 from gpxtrackposter.poster import Poster
 from gpxtrackposter.track import Track
 from gpxtrackposter.tracks_drawer import TracksDrawer
-from gpxtrackposter.units import Units
 from gpxtrackposter.value_range import ValueRange
 from gpxtrackposter.xy import XY
 from gpxtrackposter import utils
@@ -106,7 +105,7 @@ class ClockDrawer(TracksDrawer):
             self._draw_hours(dr, g, center, radius_range)
 
         year_style = f"dominant-baseline: central; font-size:{min_size * 4.0 / 80.0}px; font-family:Arial;"
-        month_style = f"font-size:{min_size * 3.0 / 80.0}px; font-family:Arial;"
+        # month_style = f"font-size:{min_size * 3.0 / 80.0}px; font-family:Arial;"
 
         g.add(
             dr.text(
@@ -138,7 +137,7 @@ class ClockDrawer(TracksDrawer):
                 stroke_width=0.3,
             )
         )
-        drad = (radius_range.upper() - radius_range.lower()) / (366 if calendar.isleap(year) else 365)
+        d_rad = (radius_range.upper() - radius_range.lower()) / (366 if calendar.isleap(year) else 365)
         day = 0
         date = datetime.date(year, 1, 1)
         animate_index = 1
@@ -164,49 +163,27 @@ class ClockDrawer(TracksDrawer):
                 animate_index += 1
             day += 1
             date += datetime.timedelta(1)
-            radius += drad
-
-    def _determine_hour_distance(self, max_length: pint.quantity.Quantity) -> typing.Optional[pint.quantity.Quantity]:
-        hour_distance = None
-        if self.poster.units == "metric":
-            unit = Units().km
-        else:
-            unit = Units().mile
-        for distance in [1.0 * unit, 5.0 * unit, 10.0 * unit, 50.0 * unit]:
-            if max_length < distance:
-                continue
-            hour_distance = distance
-            if (max_length / distance) <= 5:
-                break
-        return hour_distance
+            radius += d_rad
 
     def _draw_hours(
         self, dr: svgwrite.Drawing, g: svgwrite.container.Group, center: XY, radius_range: ValueRange
     ) -> None:
-        length_range = self.poster.length_range_by_date
-        if not length_range.is_valid():
-            return
-        min_length = length_range.lower()
-        max_length = length_range.upper()
-        assert min_length is not None
-        assert max_length is not None
-        hour_distance = self._determine_hour_distance(max_length)
-        if hour_distance is None:
-            return
-        distance = hour_distance
-        while distance < max_length:
-            radius = radius_range.interpolate((distance / max_length).magnitude)
+        line_length = min([radius_range.upper() / 30, 10])
+        for angle in range(0, 360, 30):
+            start_pos = center + XY(math.cos(math.radians(angle)) * radius_range.upper(),
+                                    math.sin(math.radians(angle)) * radius_range.upper())
+            end_pos = center + XY(math.cos(math.radians(angle)) * (radius_range.upper() + line_length),
+                                  math.sin(math.radians(angle)) * (radius_range.upper() + line_length))
             g.add(
-                dr.circle(
-                    center=center.tuple(),
-                    r=radius,
+                dr.line(
+                    start=start_pos.tuple(),
+                    end=end_pos.tuple(),
                     stroke=self._hour_color,
                     stroke_opacity="0.2",
                     fill="none",
                     stroke_width=0.3,
                 )
             )
-            distance += hour_distance
 
     def _draw_circle_segment(
         self,
@@ -222,21 +199,16 @@ class ClockDrawer(TracksDrawer):
         has_special = len([t for t in tracks if t.special]) > 0
         color = self.color(self.poster.length_range_by_date, length, has_special)
 
-        day_seconds = 60 * 60 * 12
-        start = tracks[0].start_time().time()
-        seconds = (start.hour * 60 + start.minute) * 60 + start.second
-        if seconds > day_seconds:
-            seconds -= day_seconds
-        a1 = math.radians(360.0 / day_seconds * seconds)
-        end = tracks[0].end_time().time()
-        seconds = (end.hour * 60 + end.minute) * 60 + end.second
-        if seconds > day_seconds:
-            seconds -= day_seconds
-        if seconds > day_seconds:
-            seconds -= day_seconds
-        a2 = math.radians(360.0 / day_seconds * seconds)
+        a1 = math.radians(utils.get_clock_angle_from_time(tracks[0].start_time().time()))
+        a2 = math.radians(utils.get_clock_angle_from_time(tracks[-1].end_time().time()))
         sin_a1, cos_a1 = math.sin(a1), math.cos(a1)
         sin_a2, cos_a2 = math.sin(a2), math.cos(a2)
+        print(tracks[0].start_time().time(),
+              utils.get_clock_angle_from_time(tracks[0].start_time().time()),
+              tracks[-1].end_time().time(),
+              utils.get_clock_angle_from_time(tracks[-1].start_time().time()),
+              sin_a1, cos_a1,
+              sin_a2, cos_a2)
         path = dr.path(
             d=f"M {center.x + radius * sin_a1} {center.y - radius * cos_a1} ",
             fill="none",
