@@ -36,6 +36,7 @@ usage: create_poster [-h] [--gpx-dir DIR] [--output FILE]
                      [--heatmap-center LAT,LNG] [--heatmap-radius RADIUS_KM]
                      [--circular-rings] [--circular-ring-color COLOR]
                      [--circular-ring-max-distance DISTANCE KM]
+                     [--clock-hours] [--clock-hour-color COLOR]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -53,7 +54,8 @@ optional arguments:
   --special FILE        Mark track file from the GPX directory as special; use
                         multiple times to mark multiple tracks.
   --type TYPE           Type of poster to create (default: "grid", available:
-                        "grid", "calendar", "heatmap", "circular", "github").
+                        "grid", "calendar", "heatmap", "circular", "github",
+                        "clock").
   --background-color COLOR
                         Background color of poster (default: "#222222").
   --track-color COLOR   Color of tracks (default: "#4DD2FF").
@@ -101,6 +103,11 @@ Circular Type Options:
                         Color of distance rings.
   --circular-ring-max-distance DISTANCE KM
                         Maximum distance for scaling the track length.
+
+Clock Type Options:
+  --clock-hours         Draw hour lines.
+  --clock-hour-color COLOR
+                        Color of hour lines.
 ```
 
 Example:
