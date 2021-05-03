@@ -128,7 +128,7 @@ def get_time_in_seconds(time_inp: datetime.time) -> int:
     """
     retrieve a day time in seconds from a datetime.time object
 
-    time_inp: day time to convert in seconds
+    time_inp: day time to convert into seconds
     """
     day_seconds = 60 * 60 * 12
     time_seconds = (time_inp.hour * 60 + time_inp.minute) * 60 + time_inp.second
@@ -141,7 +141,7 @@ def get_clock_angle_from_time(time_inp: datetime.time) -> float:
     """
     retrieve a day angle in degrees from a datetime.time object
 
-    time_inp: day time to convert in seconds
+    time_inp: day time to convert into clock angle
     """
     day_seconds = 60 * 60 * 12
     time_seconds = get_time_in_seconds(time_inp)
