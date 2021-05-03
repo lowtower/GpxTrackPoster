@@ -10,16 +10,15 @@ import datetime
 import math
 import typing
 
-import pint  # type: ignore
 import svgwrite  # type: ignore
 
+from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError
 from gpxtrackposter.poster import Poster
 from gpxtrackposter.track import Track
 from gpxtrackposter.tracks_drawer import TracksDrawer
 from gpxtrackposter.value_range import ValueRange
 from gpxtrackposter.xy import XY
-from gpxtrackposter import utils
 
 
 class ClockDrawer(TracksDrawer):
@@ -105,7 +104,6 @@ class ClockDrawer(TracksDrawer):
             self._draw_hours(dr, g, center, radius_range)
 
         year_style = f"dominant-baseline: central; font-size:{min_size * 4.0 / 80.0}px; font-family:Arial;"
-        # month_style = f"font-size:{min_size * 3.0 / 80.0}px; font-family:Arial;"
 
         g.add(
             dr.text(
@@ -168,12 +166,16 @@ class ClockDrawer(TracksDrawer):
     def _draw_hours(
         self, dr: svgwrite.Drawing, g: svgwrite.container.Group, center: XY, radius_range: ValueRange
     ) -> None:
-        line_length = min([radius_range.upper() / 30, 10])
+        line_length = min([radius_range.upper() / 30, 10.0])
         for angle in range(0, 360, 30):
-            start_pos = center + XY(math.cos(math.radians(angle)) * radius_range.upper(),
-                                    math.sin(math.radians(angle)) * radius_range.upper())
-            end_pos = center + XY(math.cos(math.radians(angle)) * (radius_range.upper() + line_length),
-                                  math.sin(math.radians(angle)) * (radius_range.upper() + line_length))
+            start_pos = center + XY(
+                math.cos(math.radians(angle)) * radius_range.upper(),
+                math.sin(math.radians(angle)) * radius_range.upper(),
+            )
+            end_pos = center + XY(
+                math.cos(math.radians(angle)) * (radius_range.upper() + line_length),
+                math.sin(math.radians(angle)) * (radius_range.upper() + line_length),
+            )
             g.add(
                 dr.line(
                     start=start_pos.tuple(),
@@ -203,12 +205,6 @@ class ClockDrawer(TracksDrawer):
         a2 = math.radians(utils.get_clock_angle_from_time(tracks[-1].end_time().time()))
         sin_a1, cos_a1 = math.sin(a1), math.cos(a1)
         sin_a2, cos_a2 = math.sin(a2), math.cos(a2)
-        print(tracks[0].start_time().time(),
-              utils.get_clock_angle_from_time(tracks[0].start_time().time()),
-              tracks[-1].end_time().time(),
-              utils.get_clock_angle_from_time(tracks[-1].start_time().time()),
-              sin_a1, cos_a1,
-              sin_a2, cos_a2)
         path = dr.path(
             d=f"M {center.x + radius * sin_a1} {center.y - radius * cos_a1} ",
             fill="none",
