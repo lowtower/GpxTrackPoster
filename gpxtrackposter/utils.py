@@ -4,10 +4,11 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+import datetime
 import locale
-from itertools import takewhile, count as itercount
 import math
 import typing
+from itertools import takewhile, count as itercount
 
 import colour  # type: ignore
 import s2sphere  # type: ignore
@@ -121,3 +122,28 @@ def make_key_times(year_count: int) -> typing.List[str]:
     s = list(takewhile(lambda n: n < 1, itercount(0, 1 / year_count)))
     s.append(1)
     return [str(round(i, 2)) for i in s]
+
+
+def get_time_in_seconds(time_inp: datetime.time) -> int:
+    """
+    retrieve a day time in seconds from a datetime.time object
+
+    time_inp: day time to convert in seconds
+    """
+    day_seconds = 60 * 60 * 12
+    time_seconds = (time_inp.hour * 60 + time_inp.minute) * 60 + time_inp.second
+    while time_seconds >= day_seconds:
+        time_seconds -= day_seconds
+    return time_seconds
+
+
+def get_clock_angle_from_time(time_inp: datetime.time) -> float:
+    """
+    retrieve a day angle in degrees from a datetime.time object
+
+    time_inp: day time to convert in seconds
+    """
+    day_seconds = 60 * 60 * 12
+    time_seconds = get_time_in_seconds(time_inp)
+    angle = 360.0 / day_seconds * time_seconds
+    return angle
