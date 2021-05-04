@@ -39,6 +39,7 @@ class HeatmapDrawer(TracksDrawer):
         create_args: Create arguments for heatmap.
         fetch_args: Get arguments passed.
         draw: Draw the heatmap based on the Poster's tracks.
+        draw_background: Draw the heatmaps background image if requested.
     """
 
     def __init__(self, the_poster: Poster):
