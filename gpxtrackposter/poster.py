@@ -31,8 +31,8 @@ class Poster:
     """Create a poster from track data.
 
     Attributes:
-        athlete: Name of athlete to be displayed on poster.
-        title: Title of poster.
+        _athlete: Name of athlete to be displayed on poster.
+        _title: Title of poster.
         tracks_by_date: Tracks organized temporally if needed.
         tracks: List of tracks to be used in the poster.
         length_range: Range of lengths of tracks in poster.
