@@ -201,6 +201,12 @@ The *Github Poster* displays all tracks like github profile. *Special distance* 
 ![Example Github Poster](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_github.png)
 [svg](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_github.svg)
 
+### Clock Poster (`--type clock`)
+The *Clock Poster* displays all tracks of a year in an "analog clock". Beginning at the inner circle, for each day a circle segment is drawn from the track start time to the end time. *Special tracks* are drawn with the *special color*.
+
+![Example Github Poster](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_clock.png)
+[svg](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_clock.svg)
+
 
 
 ## Selection a Language
