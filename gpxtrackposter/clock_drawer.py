@@ -17,7 +17,6 @@ from gpxtrackposter.exceptions import PosterError
 from gpxtrackposter.poster import Poster
 from gpxtrackposter.track import Track
 from gpxtrackposter.tracks_drawer import TracksDrawer
-from gpxtrackposter.value_range import ValueRange
 from gpxtrackposter.xy import XY
 
 
@@ -97,11 +96,11 @@ class ClockDrawer(TracksDrawer):
     def _draw_year(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY, year: int) -> None:
         min_size = min(size.x, size.y)
         outer_radius = 0.5 * min_size - 6
-        radius_range = ValueRange.from_pair(outer_radius / 6, outer_radius)
+        inner_radius = outer_radius / 6
         center = offset + 0.5 * size
 
         if self._hours:
-            self._draw_hours(dr, g, center, radius_range)
+            self._draw_hours(dr, g, center, outer_radius)
 
         year_style = f"dominant-baseline: central; font-size:{min_size * 4.0 / 80.0}px; font-family:Arial;"
 
@@ -118,7 +117,7 @@ class ClockDrawer(TracksDrawer):
         g.add(
             dr.circle(
                 center=center.tuple(),
-                r=radius_range.lower(),
+                r=inner_radius,
                 stroke=self._hour_color,
                 stroke_opacity="0.2",
                 fill="none",
@@ -128,18 +127,18 @@ class ClockDrawer(TracksDrawer):
         g.add(
             dr.circle(
                 center=center.tuple(),
-                r=radius_range.upper(),
+                r=outer_radius,
                 stroke=self._hour_color,
                 stroke_opacity="0.2",
                 fill="none",
                 stroke_width=0.3,
             )
         )
-        d_rad = (radius_range.upper() - radius_range.lower()) / (366 if calendar.isleap(year) else 365)
+        d_rad = (outer_radius - inner_radius) / (366 if calendar.isleap(year) else 365)
         day = 0
         date = datetime.date(year, 1, 1)
         animate_index = 1
-        radius = radius_range.lower()
+        radius = inner_radius
         while date.year == year:
             text_date = date.strftime("%Y-%m-%d")
             year_count = self.poster.year_tracks_date_count_dict[year]
@@ -163,18 +162,16 @@ class ClockDrawer(TracksDrawer):
             date += datetime.timedelta(1)
             radius += d_rad
 
-    def _draw_hours(
-        self, dr: svgwrite.Drawing, g: svgwrite.container.Group, center: XY, radius_range: ValueRange
-    ) -> None:
-        line_length = min([radius_range.upper() / 30, 10.0])
+    def _draw_hours(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, center: XY, outer_radius: float) -> None:
+        line_length = min([outer_radius / 30, 10.0])
         for angle in range(0, 360, 30):
             start_pos = center + XY(
-                math.cos(math.radians(angle)) * radius_range.upper(),
-                math.sin(math.radians(angle)) * radius_range.upper(),
+                math.cos(math.radians(angle)) * outer_radius,
+                math.sin(math.radians(angle)) * outer_radius,
             )
             end_pos = center + XY(
-                math.cos(math.radians(angle)) * (radius_range.upper() + line_length),
-                math.sin(math.radians(angle)) * (radius_range.upper() + line_length),
+                math.cos(math.radians(angle)) * (outer_radius + line_length),
+                math.sin(math.radians(angle)) * (outer_radius + line_length),
             )
             g.add(
                 dr.line(
