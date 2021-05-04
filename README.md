@@ -27,14 +27,15 @@ usage: create_poster [-h] [--gpx-dir DIR] [--output FILE]
                      [--track-color COLOR] [--track-color2 COLOR]
                      [--text-color COLOR] [--special-color COLOR]
                      [--special-color2 COLOR] [--units UNITS] [--clear-cache]
-                     [--workers NUMBER_OF_WORKERS]
-                     [--from-strava FILE] [--verbose] [--logfile FILE]
+                     [--workers NUMBER_OF_WORKERS] [--from-strava FILE]
+                     [--verbose] [--logfile FILE]
                      [--special-distance DISTANCE]
                      [--special-distance2 DISTANCE] [--min-distance DISTANCE]
-                     [--activity-type ACTIVITY_TYPE]
-                     [--with-animation] [--animation-time ANIMATION_TIME]
+                     [--activity-type ACTIVITY_TYPE] [--with-animation]
+                     [--animation-time ANIMATION_TIME]
                      [--heatmap-center LAT,LNG] [--heatmap-radius RADIUS_KM]
-                     [--circular-rings] [--circular-ring-color COLOR]
+                     [--heatmap-tile-provider TILEPROVIDER] [--circular-rings]
+                     [--circular-ring-color COLOR]
                      [--circular-ring-max-distance DISTANCE KM]
 
 optional arguments:
@@ -67,8 +68,8 @@ optional arguments:
                         "metric").
   --clear-cache         Clear the track cache.
   --workers NUMBER_OF_WORKERS
-                        Number of parallel track loading workers
-                        (default: number of CPU cores)
+                        Number of parallel track loading workers (default:
+                        number of CPU cores)
   --from-strava FILE    JSON file containing config used to get activities
                         from strava
   --verbose             Verbose logging.
@@ -94,6 +95,9 @@ Heatmap Type Options:
   --heatmap-radius RADIUS_KM
                         Scale the heatmap such that at least a circle with
                         radius=RADIUS_KM is visible (default: automatic).
+  --heatmap-tile-provider TILEPROVIDER
+                        Optionally, choose a tile provider from the list for a
+                        background map image.
 
 Circular Type Options:
   --circular-rings      Draw distance rings.
