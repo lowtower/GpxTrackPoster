@@ -30,14 +30,15 @@ class HeatmapDrawer(TracksDrawer):
     """Draw a heatmap Poster based on the tracks.
 
     Attributes:
-        center: Center of the heatmap.
-        radius: Scale the heatmap so that a circle with radius (in KM) is visible.
+        _center: Center of the heatmap.
+        _radius: Scale the heatmap so that a circle with radius (in KM) is visible.
+        _tile_provider: Tile Provider for background tiles (must comply with py-staticmaps)
+
 
     Methods:
         Create_args: Create arguments for heatmap.
         fetch_args: Get arguments passed.
         draw: Draw the heatmap based on the Poster's tracks.
-
     """
 
     def __init__(self, the_poster: Poster):
@@ -62,13 +63,12 @@ class HeatmapDrawer(TracksDrawer):
             dest="heatmap_radius",
             metavar="RADIUS_KM",
             type=float,
-            help="Scale the heatmap such that at least a circle with radius=RADIUS_KM is visible "
-            "(default: automatic).",
+            help="Scale the heatmap such that at least a circle with radius=RADIUS_KM is visible (default: automatic).",
         )
         group.add_argument(
             "--heatmap-tile-provider",
             dest="heatmap_tile_provider",
-            metavar="TILEPROVIDER",
+            metavar="TILE_PROVIDER",
             type=str,
             choices=staticmaps.default_tile_providers.keys(),
             help="Optionally, choose a tile provider from the list for a background map image.",
