@@ -73,6 +73,14 @@ class HeatmapDrawer(TracksDrawer):
             choices=staticmaps.default_tile_providers.keys(),
             help="Optionally, choose a tile provider from the list for a background map image.",
         )
+        group.add_argument(
+            "--heatmap-tile-provider",
+            dest="heatmap_tile_provider",
+            metavar="TILEPROVIDER",
+            type=str,
+            choices=staticmaps.default_tile_providers.keys(),
+            help="Optionally, choose a tile provider from the list for a background map image.",
+        )
 
     def fetch_args(self, args: argparse.Namespace) -> None:
         """Get arguments that were passed, and also perform basic validation on them.
