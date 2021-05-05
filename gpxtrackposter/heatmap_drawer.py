@@ -203,8 +203,8 @@ class HeatmapDrawer(TracksDrawer):
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
         """Draw the heatmap based on tracks."""
-        size, offset = self._get_tracks_width_height_offset(size, offset)
         bbox = self._determine_bbox()
+        size, offset = self._get_tracks_width_height_offset(bbox, size, offset)
         line_transparencies_and_widths = self._get_line_transparencies_and_widths(bbox)
         year_groups: Dict[int, svgwrite.container.Group] = {}
         for tr in self.poster.tracks:
