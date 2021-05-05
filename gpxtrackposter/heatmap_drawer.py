@@ -10,7 +10,7 @@ import math
 import os
 import typing
 import uuid
-from typing import Tuple
+from typing import Tuple, List
 
 import s2sphere  # type: ignore
 import staticmaps  # type: ignore
@@ -49,6 +49,7 @@ class HeatmapDrawer(TracksDrawer):
         self._tile_provider: typing.Optional[staticmaps.TileProvider] = None
         self._tile_context: staticmaps.Context = staticmaps.Context()
         self._bg_max_size: int = 1024
+        self._heatmap_line_width: List[Tuple[float, float]] = [(0.1, 5.0), (0.2, 2.0), (1.0, 0.3)]
 
     def create_args(self, args_parser: argparse.ArgumentParser) -> None:
         group = args_parser.add_argument_group("Heatmap Type Options")
@@ -145,8 +146,8 @@ class HeatmapDrawer(TracksDrawer):
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
         """Draw the heatmap based on tracks."""
-        size, offset = self._get_tracks_width_height_offset(size, offset)
         bbox = self._determine_bbox()
+        size, offset = self._get_tracks_width_height_offset(bbox, size, offset)
         year_groups: typing.Dict[int, svgwrite.container.Group] = {}
         for tr in self.poster.tracks:
             year = tr.start_time().year
@@ -158,7 +159,7 @@ class HeatmapDrawer(TracksDrawer):
                 g_year = year_groups[year]
             color = self.color(self.poster.length_range, tr.length(), tr.special)
             for line in utils.project(bbox, size, offset, tr.polylines):
-                for opacity, width in [(0.1, 5.0), (0.2, 2.0), (1.0, 0.3)]:
+                for opacity, width in self._heatmap_line_width:
                     g_year.add(
                         dr.polyline(
                             points=line,
@@ -186,7 +187,7 @@ class HeatmapDrawer(TracksDrawer):
             self.poster.padding["l"] + self.poster.padding["r"], self.poster.padding["t"] + self.poster.padding["b"]
         )
         offset = offset + XY(self.poster.padding["l"], self.poster.padding["t"])
-        bg_size = self._get_bg_size(size)
+        bg_size = size.scale_to_max_value(self._bg_max_size)
 
         image = self._tile_context.render_pillow(int(bg_size.x), int(bg_size.y))
         try:
@@ -200,19 +201,11 @@ class HeatmapDrawer(TracksDrawer):
         except (Image.DecompressionBombError, FileNotFoundError):
             print("Something went wrong generating the background image!")
 
-    def _get_bg_size(self, size: XY) -> XY:
-        if size.x > size.y:
-            width = self._bg_max_size
-            height = int(width * size.y / size.x)
-        else:
-            height = self._bg_max_size
-            width = int(height * size.x / size.y)
-        return XY(width, height)
-
-    def _get_tracks_width_height_offset(self, size: XY, offset: XY) -> Tuple[XY, XY]:
+    def _get_tracks_width_height_offset(self, bbox: s2sphere.LatLngRect, size: XY, offset: XY) -> Tuple[XY, XY]:
         if not self._tile_provider:
             return size, offset
-        bg_size = self._get_bg_size(size)
+
+        bg_size = size.scale_to_max_value(self._bg_max_size)
         scale = XY(size.x / bg_size.x, size.y / bg_size.y)
         center, zoom = self._tile_context.determine_center_zoom(int(bg_size.x), int(bg_size.y))
         transformer = staticmaps.Transformer(
@@ -222,13 +215,13 @@ class HeatmapDrawer(TracksDrawer):
             center,
             staticmaps.default_tile_providers[self._tile_provider].tile_size(),
         )
-        bbox = self._determine_bbox()
-        tr_width = math.fabs(transformer.ll2pixel(bbox.hi())[0] - transformer.ll2pixel(bbox.lo())[0])
-        tr_height = math.fabs(transformer.ll2pixel(bbox.hi())[1] - transformer.ll2pixel(bbox.lo())[1])
-        tr_size = XY(int(scale.x * tr_width), int(scale.y * tr_height))
-        stroke = 0.0
-        tr_offset_x = stroke + offset.x + scale.x * transformer.ll2pixel(bbox.lo())[0]
-        tr_offset_y = stroke + offset.y + scale.y * transformer.ll2pixel(bbox.hi())[1]
-        tr_offset = XY(int(tr_offset_x), int(tr_offset_y))
+        tracks_width = math.fabs(transformer.ll2pixel(bbox.hi())[0] - transformer.ll2pixel(bbox.lo())[0])
+        tracks_height = math.fabs(transformer.ll2pixel(bbox.hi())[1] - transformer.ll2pixel(bbox.lo())[1])
+        tracks_size = XY(int(scale.x * tracks_width), int(scale.y * tracks_height))
+        # [(0.1, 5.0), (0.2, 2.0), (1.0, 0.3)]
+        stroke = self._heatmap_line_width[0][1]
+        tracks_offset_x = stroke + offset.x + scale.x * transformer.ll2pixel(bbox.lo())[0]
+        tracks_offset_y = stroke + offset.y + scale.y * transformer.ll2pixel(bbox.hi())[1]
+        tracks_offset = XY(int(tracks_offset_x), int(tracks_offset_y))
 
-        return tr_size, tr_offset
+        return tracks_size, tracks_offset
