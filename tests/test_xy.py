@@ -3,12 +3,14 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from typing import List, Tuple, Union
+
 from gpxtrackposter.xy import XY
 
 
 def test_multiplication() -> None:
-    test_object = XY(50.0, 100.0)
-    test_values = [
+    test_object: XY = XY(50.0, 100.0)
+    test_values: List[Union[Tuple[float, XY], Tuple[XY, XY]]] = [
         (10.0, XY(500.0, 1000.0)),
         (10, XY(500.0, 1000.0)),
         (0.5, XY(25.0, 50.0)),
@@ -23,8 +25,8 @@ def test_multiplication() -> None:
 
 
 def test_addition() -> None:
-    test_object = XY(50.0, 100.0)
-    test_values = [
+    test_object: XY = XY(50.0, 100.0)
+    test_values: List[Union[Tuple[float, XY], Tuple[XY, XY]]] = [
         (10.0, XY(60.0, 110.0)),
         (10, XY(60.0, 110.0)),
         (0.5, XY(50.5, 100.5)),
@@ -39,8 +41,8 @@ def test_addition() -> None:
 
 
 def test_subtraction() -> None:
-    test_object = XY(50.0, 100.0)
-    test_values = [
+    test_object: XY = XY(50.0, 100.0)
+    test_values: List[Union[Tuple[float, XY], Tuple[XY, XY]]] = [
         (10.0, XY(40.0, 90.0)),
         (10, XY(40.0, 90.0)),
         (0.5, XY(49.5, 99.5)),
@@ -55,24 +57,24 @@ def test_subtraction() -> None:
 
 
 def test_representation() -> None:
-    test_object = XY(50.0, 100.0)
+    test_object: XY = XY(50.0, 100.0)
     assert str(test_object) == "XY: 50.0/100.0"
 
 
 def test_tuple() -> None:
-    test_object = XY(50.0, 100.0)
+    test_object: XY = XY(50.0, 100.0)
     assert test_object.tuple() == (50.0, 100.0)
 
 
 def test_scale_to_max_value() -> None:
-    test_object = XY(50.0, 100.0)
-    good_values = [
+    test_object: XY = XY(50.0, 100.0)
+    good_values: List[Tuple[float, XY]] = [
         (25.0, XY(12.5, 25.0)),
         (50.0, XY(25.0, 50.0)),
         (200.0, XY(100.0, 200.0)),
         (-50.0, XY(-25.0, -50.0)),
     ]
-    bad_values = [
+    bad_values: List[Tuple[float, XY]] = [
         (25.0, XY(25.0, 12.5)),
         (-50.0, XY(25.0, -50.0)),
         (-50.0, XY(-25.0, 50.0)),
