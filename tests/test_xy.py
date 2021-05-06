@@ -82,6 +82,11 @@ def test_tuple() -> None:
     assert test_object.tuple() == (50.0, 100.0)
 
 
+def test_int() -> None:
+    test_object: XY = XY(50.12345, 100.98765)
+    assert test_object.int().tuple() == (50, 100)
+
+
 def test_scale_to_max_value() -> None:
     test_object: XY = XY(50.0, 100.0)
     good_values: List[Tuple[float, XY]] = [
