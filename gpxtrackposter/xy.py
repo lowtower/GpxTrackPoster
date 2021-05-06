@@ -24,11 +24,15 @@ class XY:
             return XY(self.x * factor.x, self.y * factor.y)
         return XY(self.x * factor, self.y * factor)
 
-    def __add__(self, other: "XY") -> "XY":
-        return XY(self.x + other.x, self.y + other.y)
+    def __add__(self, other: Union[float, "XY"]) -> "XY":
+        if isinstance(other, XY):
+            return XY(self.x + other.x, self.y + other.y)
+        return XY(self.x + other, self.y + other)
 
-    def __sub__(self, other: "XY") -> "XY":
-        return XY(self.x - other.x, self.y - other.y)
+    def __sub__(self, other: Union[float, "XY"]) -> "XY":
+        if isinstance(other, XY):
+            return XY(self.x - other.x, self.y - other.y)
+        return XY(self.x - other, self.y - other)
 
     def __repr__(self) -> str:
         return f"XY: {self.x}/{self.y}"
@@ -50,8 +54,8 @@ class XY:
         """
         if self.x > self.y:
             x = max_value
-            y = x * self.y / self.x
+            y = x / self.y * self.y
         else:
             y = max_value
-            x = y * self.x / self.y
+            x = y / self.y * self.x
         return XY(x, y)
