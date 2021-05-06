@@ -4,15 +4,15 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 
 class XY:
     """Represent x,y values with properly overloaded operations."""
 
     def __init__(self, x: float = 0, y: float = 0) -> None:
-        self.x = x
-        self.y = y
+        self.x: Union[int, float] = x
+        self.y: Union[int, float] = y
 
     def __mul__(self, factor: Union[float, "XY"]) -> "XY":
         if isinstance(factor, XY):
@@ -56,13 +56,21 @@ class XY:
         """
         return self.x, self.y
 
-    def int(self) -> "XY":
+    def to_int(self) -> "XY":
         """
         Return an XY object with integer values
 
         return: XY object with integer x and y values
         """
         return XY(int(self.x), int(self.y))
+
+    def round(self, n: Optional[int] = None) -> "XY":
+        """
+        Return an XY object with rounded values
+
+        return: XY object with rounded x and y values
+        """
+        return XY(round(self.x, n), round(self.y, n))
 
     def scale_to_max_value(self, max_value: float) -> "XY":
         """
