@@ -24,6 +24,22 @@ def test_multiplication() -> None:
         assert (test_object * other).tuple() == result.tuple()
 
 
+def test_division() -> None:
+    test_object: XY = XY(50.0, 100.0)
+    test_values: List[Union[Tuple[float, XY], Tuple[XY, XY]]] = [
+        (10.0, XY(5.0, 10.0)),
+        (10, XY(5.0, 10.0)),
+        (0.5, XY(100.0, 200.0)),
+        (-5.0, XY(-10.0, -20.0)),
+        (XY(10.0, 5.0), XY(5.0, 20.0)),
+        (XY(-10.0, 5.0), XY(-5.0, 20.0)),
+        (XY(0.5, -5.0), XY(100.0, -20.0)),
+    ]
+    for test_value in test_values:
+        other, result = test_value
+        assert (test_object / other).tuple() == result.tuple()
+
+
 def test_addition() -> None:
     test_object: XY = XY(50.0, 100.0)
     test_values: List[Union[Tuple[float, XY], Tuple[XY, XY]]] = [
