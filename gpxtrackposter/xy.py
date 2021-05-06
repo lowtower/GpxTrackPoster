@@ -56,6 +56,14 @@ class XY:
         """
         return self.x, self.y
 
+    def int(self) -> "XY":
+        """
+        Return an XY object with integer values
+
+        return: XY object with integer x and y values
+        """
+        return XY(int(self.x), int(self.y))
+
     def scale_to_max_value(self, max_value: float) -> "XY":
         """
         Scale the x and y values to given maximum value
