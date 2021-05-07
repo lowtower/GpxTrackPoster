@@ -210,6 +210,7 @@ class HeatmapDrawer(TracksDrawer):
             staticmaps.default_tile_providers[self._tile_provider].tile_size(),
         )
 
+        # TODO: remove testing code
         # from staticmaps.color import BLACK, RED
         # self._tile_context.add_object(staticmaps.Line([bbox.lo(), bbox.hi()], RED, 1))
         # self._tile_context.add_object(
