@@ -34,6 +34,8 @@ usage: create_poster [-h] [--gpx-dir DIR] [--output FILE]
                      [--activity-type ACTIVITY_TYPE] [--with-animation]
                      [--animation-time ANIMATION_TIME]
                      [--heatmap-center LAT,LNG] [--heatmap-radius RADIUS_KM]
+                     [--heatmap-tile-provider TILE_PROVIDER]
+                     [--heatmap-tile-max-size PIXEL] [--circular-rings]
                      [--heatmap-line-transparency-width TRANSP_1,WIDTH_1, TRANSP_2,WIDTH_2, TRANSP_3,WIDTH_3]
                      [--circular-rings] [--circular-ring-color COLOR]
                      [--heatmap-tile-provider TILEPROVIDER] [--circular-rings]
@@ -101,9 +103,14 @@ Heatmap Type Options:
                         Define three transparency and width tuples for the
                         heatmap lines or set it to `automatic` for automatic
                         calculation (default: 0.1,5.0, 0.2,2.0, 1.0,0.3).
-  --heatmap-tile-provider TILEPROVIDER
+  --heatmap-tile-provider TILE_PROVIDER
                         Optionally, choose a tile provider from the list for a
                         background map image.
+  --heatmap-tile-max-size PIXEL
+                        Set the maximum background image size (which is
+                        afterwards scaled to the poster size). This setting
+                        defines how much details will be shown on the map. Be
+                        sure to choose a reasonable value! (default: 1200 px)
 
 Circular Type Options:
   --circular-rings      Draw distance rings.

@@ -8,16 +8,17 @@ import argparse
 import logging
 import math
 import os
+import typing
 import uuid
 from typing import Dict, List, Optional, Tuple
+from operator import itemgetter
+from typing import Tuple, List
 
 import s2sphere  # type: ignore
 import staticmaps  # type: ignore
 import svgwrite  # type: ignore
-
 from PIL import Image  # type: ignore
 
-from geopy.distance import distance  # type: ignore
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import ParameterError
 from gpxtrackposter.poster import Poster
@@ -54,6 +55,7 @@ class HeatmapDrawer(TracksDrawer):
         self._tile_provider: Optional[staticmaps.TileProvider] = None
         self._tile_context: staticmaps.Context = staticmaps.Context()
         self._bg_max_size: int = 1024
+        self._transformer: typing.Optional[staticmaps.Transformer] = None
 
     def create_args(self, args_parser: argparse.ArgumentParser) -> None:
         group = args_parser.add_argument_group("Heatmap Type Options")
@@ -86,6 +88,16 @@ class HeatmapDrawer(TracksDrawer):
             type=str,
             choices=staticmaps.default_tile_providers.keys(),
             help="Optionally, choose a tile provider from the list for a background map image.",
+        )
+        group.add_argument(
+            "--heatmap-tile-max-size",
+            dest="heatmap_tile_max_size",
+            metavar="PIXEL",
+            type=int,
+            default=1200,
+            help="Set the maximum background image size (which is afterwards scaled to the poster size). "
+            "This setting defines how much details will be shown on the map. "
+            "Be sure to choose a reasonable value! (default: 1200 px)",
         )
 
     # pylint: disable=too-many-branches
@@ -140,6 +152,11 @@ class HeatmapDrawer(TracksDrawer):
                     raise ParameterError(f"Not three valid TRANSPARENCY,WIDTH pairs: {args.heatmap_line_width}") from e
         if args.heatmap_tile_provider:
             self._tile_provider = args.heatmap_tile_provider
+        if args.heatmap_tile_max_size:
+            self._bg_max_size = args.heatmap_tile_max_size
+            if args.heatmap_tile_max_size > 3600:
+                print(f"A size of < {args.heatmap_tile_max_size} > pixels for the background image is very high.\n"
+                      f"Try to chose a smaller size!")
 
     def _get_line_transparencies_and_widths(self, bbox: s2sphere.sphere.LatLngRect) -> List[Tuple[float, float]]:
         if self._heatmap_line_width:
@@ -245,16 +262,41 @@ class HeatmapDrawer(TracksDrawer):
             self.poster.padding["l"] + self.poster.padding["r"], self.poster.padding["t"] + self.poster.padding["b"]
         )
         offset = offset + XY(self.poster.padding["l"], self.poster.padding["t"])
-        bg_size = self._get_bg_size(size)
+        bg_size = self._get_bg_size(size).round().to_int()
 
-        image = self._tile_context.render_pillow(int(bg_size.x), int(bg_size.y))
+        # set transformer with center and zoom
+        center, zoom = self._tile_context.determine_center_zoom(bg_size.x, bg_size.y)
+        self._transformer = staticmaps.Transformer(
+            bg_size.x,
+            bg_size.y,
+            zoom,
+            center,
+            staticmaps.default_tile_providers[self._tile_provider].tile_size(),
+        )
+
+        # from staticmaps.color import BLACK, RED
+        # self._tile_context.add_object(staticmaps.Line([bbox.lo(), bbox.hi()], RED, 1))
+        # self._tile_context.add_object(
+        #     staticmaps.Line(
+        #         [
+        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
+        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_hi()),
+        #             s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_hi()),
+        #             s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_lo()),
+        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
+        #         ],
+        #         BLACK,
+        #         1,
+        #     )
+        # )
+
+        image = self._tile_context.render_pillow(bg_size.x, bg_size.y)
         try:
-            tmp_file = str(uuid.uuid4()) + ".png"
+            tmp_file = f"{uuid.uuid4()}.png"
             image.save(tmp_file)
             with open(tmp_file, "rb") as f:
-                img_tmp = f.read()
-            img_inl = staticmaps.SvgRenderer.create_inline_image(img_tmp)
-            dr.add(dr.image(img_inl, insert=(offset.x, offset.y), size=(size.x, size.y)))
+                img_inl = staticmaps.SvgRenderer.create_inline_image(f.read())
+                dr.add(dr.image(img_inl, insert=(offset.x, offset.y), size=(size.x, size.y)))
             os.remove(tmp_file)
         except (Image.DecompressionBombError, FileNotFoundError):
             print("Something went wrong generating the background image!")
@@ -269,8 +311,27 @@ class HeatmapDrawer(TracksDrawer):
         return XY(width, height)
 
     def _get_tracks_width_height_offset(self, size: XY, offset: XY) -> Tuple[XY, XY]:
+    def _get_tracks_size_offset(self, bbox: s2sphere.LatLngRect, size: XY, offset: XY) -> Tuple[XY, XY]:
         if not self._tile_provider:
             return size, offset
+
+        # background image size
+        bg_size = size.scale_to_max_value(self._bg_max_size)
+        tracks_scale = size / bg_size
+
+        transformer = self._transformer
+        tracks_width = math.fabs(transformer.ll2pixel(bbox.hi())[0] - transformer.ll2pixel(bbox.lo())[0])
+        tracks_height = math.fabs(transformer.ll2pixel(bbox.hi())[1] - transformer.ll2pixel(bbox.lo())[1])
+        # add maximum track line width
+        max_stroke = max(self._heatmap_line_width, key=itemgetter(1))[1]
+        half_stroke = max_stroke / 2
+        tracks_size = XY(tracks_width, tracks_height) + max_stroke
+        tracks_size_scaled = tracks_scale * tracks_size
+        tracks_offset = offset + tracks_scale * (
+            XY(math.fabs(transformer.ll2pixel(bbox.lo())[0]), math.fabs(transformer.ll2pixel(bbox.hi())[1]))
+            - half_stroke
+        )
+        return tracks_size_scaled, tracks_offset
         bg_size = self._get_bg_size(size)
         scale = XY(size.x / bg_size.x, size.y / bg_size.y)
         center, zoom = self._tile_context.determine_center_zoom(int(bg_size.x), int(bg_size.y))
