@@ -155,8 +155,10 @@ class HeatmapDrawer(TracksDrawer):
         if args.heatmap_tile_max_size:
             self._bg_max_size = args.heatmap_tile_max_size
             if args.heatmap_tile_max_size > 3600:
-                print(f"A size of < {args.heatmap_tile_max_size} > pixels for the background image is very high.\n"
-                      f"Try to chose a smaller size!")
+                print(
+                    f"A size of < {args.heatmap_tile_max_size} > pixels for the background image is very high.\n"
+                    f"Try to chose a smaller size!"
+                )
 
     def _get_line_transparencies_and_widths(self, bbox: s2sphere.sphere.LatLngRect) -> List[Tuple[float, float]]:
         if self._heatmap_line_width:
@@ -320,6 +322,7 @@ class HeatmapDrawer(TracksDrawer):
         tracks_scale = size / bg_size
 
         transformer = self._transformer
+        assert transformer is not None
         tracks_width = math.fabs(transformer.ll2pixel(bbox.hi())[0] - transformer.ll2pixel(bbox.lo())[0])
         tracks_height = math.fabs(transformer.ll2pixel(bbox.hi())[1] - transformer.ll2pixel(bbox.lo())[1])
         # add maximum track line width
