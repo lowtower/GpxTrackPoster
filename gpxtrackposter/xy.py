@@ -72,6 +72,22 @@ class XY:
         """
         return XY(round(self.x, n), round(self.y, n))
 
+    def get_max(self) -> Union[int, float]:
+        """
+        Return the maximum of the x and y value
+
+        return: maximum value
+        """
+        return max([self.x, self.y])
+
+    def get_min(self) -> Union[int, float]:
+        """
+        Return the minimum of the x and y value
+
+        return: minimum value
+        """
+        return min([self.x, self.y])
+
     def scale_to_max_value(self, max_value: float) -> "XY":
         """
         Scale the x and y values to given maximum value

@@ -103,6 +103,34 @@ def test_round() -> None:
         assert test_object.round(n).tuple() == result
 
 
+def test_get_max() -> None:
+    test_values: List[Tuple[XY, Union[int, float]]] = [
+        (XY(12.5, 25.0), 25.0),
+        (XY(25.0, 12.5), 25.0),
+        (XY(12.5, -25.0), 12.5),
+        (XY(-25.0, 12.5), 12.5),
+        (XY(12, 25), 25),
+        (XY(25, 12), 25),
+    ]
+    for test_value in test_values:
+        test_object, result = test_value
+        assert test_object.get_max() == result
+
+
+def test_get_min() -> None:
+    test_values: List[Tuple[XY, Union[int, float]]] = [
+        (XY(12.5, 25.0), 12.5),
+        (XY(25.0, 12.5), 12.5),
+        (XY(12.5, -25.0), -25.0),
+        (XY(-25.0, 12.5), -25.0),
+        (XY(12, 25), 12),
+        (XY(25, 12), 12),
+    ]
+    for test_value in test_values:
+        test_object, result = test_value
+        assert test_object.get_min() == result
+
+
 def test_scale_to_max_value() -> None:
     test_object: XY = XY(50.0, 100.0)
     good_values: List[Tuple[float, Tuple[float, float]]] = [
