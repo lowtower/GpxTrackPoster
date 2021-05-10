@@ -12,7 +12,6 @@ import typing
 import uuid
 from typing import Dict, List, Optional, Tuple
 from operator import itemgetter
-from typing import Tuple, List
 
 import s2sphere  # type: ignore
 import staticmaps  # type: ignore
@@ -264,7 +263,12 @@ class HeatmapDrawer(TracksDrawer):
             self.poster.padding["l"] + self.poster.padding["r"], self.poster.padding["t"] + self.poster.padding["b"]
         )
         offset = offset + XY(self.poster.padding["l"], self.poster.padding["t"])
-        bg_size = self._get_bg_size(size).round().to_int()
+        bg_size = self._get_bg_size(size).round()
+
+        # get maximum track line width, scale and add to background image boundary
+        scale = max([bg_size.x / size.x, bg_size.y / size.y])
+        half_stroke = round(scale * (max(self._heatmap_line_width, key=itemgetter(1))[1] / 2))
+        self._tile_context.add_bounds(bbox, half_stroke)
 
         # set transformer with center and zoom
         center, zoom = self._tile_context.determine_center_zoom(bg_size.x, bg_size.y)
@@ -304,16 +308,6 @@ class HeatmapDrawer(TracksDrawer):
         except (Image.DecompressionBombError, FileNotFoundError):
             print("Something went wrong generating the background image!")
 
-    def _get_bg_size(self, size: XY) -> XY:
-        if size.x > size.y:
-            width = self._bg_max_size
-            height = int(width * size.y / size.x)
-        else:
-            height = self._bg_max_size
-            width = int(height * size.x / size.y)
-        return XY(width, height)
-
-    def _get_tracks_width_height_offset(self, size: XY, offset: XY) -> Tuple[XY, XY]:
     def _get_tracks_size_offset(self, bbox: s2sphere.LatLngRect, size: XY, offset: XY) -> Tuple[XY, XY]:
         if not self._tile_provider:
             return size, offset
@@ -336,23 +330,3 @@ class HeatmapDrawer(TracksDrawer):
             - half_stroke
         )
         return tracks_size_scaled, tracks_offset
-        bg_size = self._get_bg_size(size)
-        scale = XY(size.x / bg_size.x, size.y / bg_size.y)
-        center, zoom = self._tile_context.determine_center_zoom(int(bg_size.x), int(bg_size.y))
-        transformer = staticmaps.Transformer(
-            int(bg_size.x),
-            int(bg_size.y),
-            zoom,
-            center,
-            staticmaps.default_tile_providers[self._tile_provider].tile_size(),
-        )
-        bbox = self._determine_bbox()
-        tr_width = math.fabs(transformer.ll2pixel(bbox.hi())[0] - transformer.ll2pixel(bbox.lo())[0])
-        tr_height = math.fabs(transformer.ll2pixel(bbox.hi())[1] - transformer.ll2pixel(bbox.lo())[1])
-        tr_size = XY(int(scale.x * tr_width), int(scale.y * tr_height))
-        stroke = 0.0
-        tr_offset_x = stroke + offset.x + scale.x * transformer.ll2pixel(bbox.lo())[0]
-        tr_offset_y = stroke + offset.y + scale.y * transformer.ll2pixel(bbox.hi())[1]
-        tr_offset = XY(int(tr_offset_x), int(tr_offset_y))
-
-        return tr_size, tr_offset
