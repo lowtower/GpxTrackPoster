@@ -192,13 +192,17 @@ class HeatmapDrawer(TracksDrawer):
         bbox = self._determine_bbox()
         self._tile_context.set_tile_provider(staticmaps.default_tile_providers[self._tile_provider])
         self._tile_context.set_center(bbox.get_center())
-        self._tile_context.add_bounds(bbox)
         # remove padding from poster size to retrieve background image size
         size = size - XY(
             self.poster.padding["l"] + self.poster.padding["r"], self.poster.padding["t"] + self.poster.padding["b"]
         )
         offset = offset + XY(self.poster.padding["l"], self.poster.padding["t"])
-        bg_size = size.scale_to_max_value(self._bg_max_size).round().to_int()
+        bg_size = size.scale_to_max_value(self._bg_max_size).round()
+
+        # get maximum track line width, scale and add to background image boundary
+        scale = max([bg_size.x / size.x, bg_size.y / size.y])
+        half_stroke = round(scale * (max(self._heatmap_line_width, key=itemgetter(1))[1] / 2))
+        self._tile_context.add_bounds(bbox, half_stroke)
 
         # set transformer with center and zoom
         center, zoom = self._tile_context.determine_center_zoom(bg_size.x, bg_size.y)
