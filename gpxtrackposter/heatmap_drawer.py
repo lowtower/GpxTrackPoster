@@ -8,15 +8,15 @@ import argparse
 import logging
 import math
 import os
-import typing
 import uuid
-from typing import Dict, List, Optional, Tuple
 from operator import itemgetter
+from typing import Dict, List, Optional, Tuple
 
 import s2sphere  # type: ignore
 import staticmaps  # type: ignore
 import svgwrite  # type: ignore
 from PIL import Image  # type: ignore
+from geopy.distance import distance  # type: ignore
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import ParameterError
@@ -53,8 +53,8 @@ class HeatmapDrawer(TracksDrawer):
         self._heatmap_line_width: Optional[List[Tuple[float, float]]] = self._heatmap_line_width_lower
         self._tile_provider: Optional[staticmaps.TileProvider] = None
         self._tile_context: staticmaps.Context = staticmaps.Context()
-        self._bg_max_size: int = 1024
-        self._transformer: typing.Optional[staticmaps.Transformer] = None
+        self._bg_max_size: int = 1200
+        self._transformer: Optional[staticmaps.Transformer] = None
 
     def create_args(self, args_parser: argparse.ArgumentParser) -> None:
         group = args_parser.add_argument_group("Heatmap Type Options")
@@ -222,7 +222,7 @@ class HeatmapDrawer(TracksDrawer):
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
         """Draw the heatmap based on tracks."""
         bbox = self._determine_bbox()
-        size, offset = self._get_tracks_width_height_offset(bbox, size, offset)
+        size, offset = self._get_tracks_size_offset(bbox, size, offset)
         line_transparencies_and_widths = self._get_line_transparencies_and_widths(bbox)
         year_groups: Dict[int, svgwrite.container.Group] = {}
         for tr in self.poster.tracks:
@@ -257,13 +257,12 @@ class HeatmapDrawer(TracksDrawer):
         bbox = self._determine_bbox()
         self._tile_context.set_tile_provider(staticmaps.default_tile_providers[self._tile_provider])
         self._tile_context.set_center(bbox.get_center())
-        self._tile_context.add_bounds(bbox)
         # remove padding from poster size to retrieve background image size
         size = size - XY(
             self.poster.padding["l"] + self.poster.padding["r"], self.poster.padding["t"] + self.poster.padding["b"]
         )
         offset = offset + XY(self.poster.padding["l"], self.poster.padding["t"])
-        bg_size = self._get_bg_size(size).round()
+        bg_size = size.scale_to_max_value(self._bg_max_size).round()
 
         # get maximum track line width, scale and add to background image boundary
         scale = max([bg_size.x / size.x, bg_size.y / size.y])
@@ -281,21 +280,21 @@ class HeatmapDrawer(TracksDrawer):
         )
 
         # TODO: remove testing code
-        # from staticmaps.color import BLACK, RED
-        # self._tile_context.add_object(staticmaps.Line([bbox.lo(), bbox.hi()], RED, 1))
-        # self._tile_context.add_object(
-        #     staticmaps.Line(
-        #         [
-        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
-        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_hi()),
-        #             s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_hi()),
-        #             s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_lo()),
-        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
-        #         ],
-        #         BLACK,
-        #         1,
-        #     )
-        # )
+        from staticmaps.color import BLACK, RED
+        self._tile_context.add_object(staticmaps.Line([bbox.lo(), bbox.hi()], RED, 1))
+        self._tile_context.add_object(
+            staticmaps.Line(
+                [
+                    s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
+                    s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_hi()),
+                    s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_hi()),
+                    s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_lo()),
+                    s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
+                ],
+                BLACK,
+                1,
+            )
+        )
 
         image = self._tile_context.render_pillow(bg_size.x, bg_size.y)
         try:
