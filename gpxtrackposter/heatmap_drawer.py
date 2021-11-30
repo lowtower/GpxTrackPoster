@@ -50,7 +50,7 @@ class HeatmapDrawer(TracksDrawer):
         self._heatmap_line_width_upp: float = 1000.0
         self._heatmap_line_width_lower: List[Tuple[float, float]] = [(0.10, 5.0), (0.20, 2.0), (1.0, 0.30)]
         self._heatmap_line_width_upper: List[Tuple[float, float]] = [(0.02, 0.5), (0.05, 0.2), (1.0, 0.05)]
-        self._heatmap_line_width: Optional[List[Tuple[float, float]]] = self._heatmap_line_width_lower
+        self._heatmap_line_width: List[Tuple[float, float]] = self._heatmap_line_width_lower
         self._tile_provider: Optional[staticmaps.TileProvider] = None
         self._tile_context: staticmaps.Context = staticmaps.Context()
         self._bg_max_size: int = 1200
@@ -131,7 +131,7 @@ class HeatmapDrawer(TracksDrawer):
             self._radius = args.heatmap_radius
         if args.heatmap_line_width:
             if args.heatmap_line_width.lower() == "automatic":
-                self._heatmap_line_width = None
+                self._heatmap_line_width = []
             else:
                 trans_width_str = args.heatmap_line_width.split(",")
                 if len(trans_width_str) != 6:
@@ -279,22 +279,22 @@ class HeatmapDrawer(TracksDrawer):
             staticmaps.default_tile_providers[self._tile_provider].tile_size(),
         )
 
-        # TODO: remove testing code
-        from staticmaps.color import BLACK, RED
-        self._tile_context.add_object(staticmaps.Line([bbox.lo(), bbox.hi()], RED, 1))
-        self._tile_context.add_object(
-            staticmaps.Line(
-                [
-                    s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
-                    s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_hi()),
-                    s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_hi()),
-                    s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_lo()),
-                    s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
-                ],
-                BLACK,
-                1,
-            )
-        )
+        # TODOX: remove testing code
+        # from staticmaps.color import BLACK, RED
+        # self._tile_context.add_object(staticmaps.Line([bbox.lo(), bbox.hi()], RED, 1))
+        # self._tile_context.add_object(
+        #     staticmaps.Line(
+        #         [
+        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
+        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_hi()),
+        #             s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_hi()),
+        #             s2sphere.LatLng.from_angles(bbox.lat_hi(), bbox.lng_lo()),
+        #             s2sphere.LatLng.from_angles(bbox.lat_lo(), bbox.lng_lo()),
+        #         ],
+        #         BLACK,
+        #         1,
+        #     )
+        #  )
 
         image = self._tile_context.render_pillow(bg_size.x, bg_size.y)
         try:
