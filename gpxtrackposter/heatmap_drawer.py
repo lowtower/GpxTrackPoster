@@ -126,7 +126,7 @@ class HeatmapDrawer(TracksDrawer):
             self._radius = args.heatmap_radius
         if args.heatmap_line_width:
             if args.heatmap_line_width.lower() == "automatic":
-                self._heatmap_line_width = []
+                self._heatmap_line_width = self._get_line_transparencies_and_widths(self._determine_bbox())
             else:
                 trans_width_str = args.heatmap_line_width.split(",")
                 if len(trans_width_str) != 6:
@@ -155,8 +155,6 @@ class HeatmapDrawer(TracksDrawer):
                 )
 
     def _get_line_transparencies_and_widths(self, bbox: s2sphere.sphere.LatLngRect) -> List[Tuple[float, float]]:
-        if self._heatmap_line_width:
-            return self._heatmap_line_width
         # automatic calculation of line transparencies and widths
         low = self._heatmap_line_width_low
         upp = self._heatmap_line_width_upp
