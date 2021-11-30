@@ -148,7 +148,7 @@ class HeatmapDrawer(TracksDrawer):
             self._tile_provider = args.heatmap_tile_provider
         if args.heatmap_tile_max_size:
             self._bg_max_size = args.heatmap_tile_max_size
-            if args.heatmap_tile_max_size > 3600:
+            if args.heatmap_tile_max_size > 4800:
                 print(
                     f"A size of < {args.heatmap_tile_max_size} > pixels for the background image is very high.\n"
                     f"Try to chose a smaller size!"
