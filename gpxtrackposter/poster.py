@@ -59,7 +59,7 @@ class Poster:
         self.tracks: typing.List[Track] = []
         self.length_range = QuantityRange()
         self.length_range_by_date = QuantityRange()
-        self.total_length_year_dict: typing.Dict[int, pint.quantity.Quantity] = defaultdict(int)
+        self.total_length_year_dict: typing.Dict[int, pint.quantity.Quantity] = defaultdict(int)  # type: ignore
         self.units = "metric"
         self.colors = {
             "background": "#222222",
@@ -156,7 +156,7 @@ class Poster:
             self.tracks_by_date[text_date].append(track)
             self.length_range.extend(track.length())
         for date_tracks in self.tracks_by_date.values():
-            length = sum([t.length() for t in date_tracks])
+            length = pint.quantity.Quantity(sum([t.length() for t in date_tracks]))
             self.length_range_by_date.extend(length)
 
     def draw(self, drawer: "TracksDrawer", output: str) -> None:
@@ -293,8 +293,8 @@ class Poster:
             assert min_length is not None
             assert max_length is not None
         else:
-            min_length = 0.0
-            max_length = 0.0
+            min_length = pint.quantity.Quantity(0.0)
+            max_length = pint.quantity.Quantity(0.0)
         g.add(
             d.text(
                 self.translate("Min") + ": " + self.format_distance(min_length),
