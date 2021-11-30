@@ -30,11 +30,6 @@ log = logging.getLogger(__name__)
 class HeatmapDrawer(TracksDrawer):
     """Draw a heatmap Poster based on the tracks.
 
-    Attributes:
-        _center: Center of the heatmap.
-        _radius: Scale the heatmap so that a circle with radius (in KM) is visible.
-        _tile_provider: Tile Provider for background tiles (must comply with py-staticmaps)
-
     Methods:
         create_args: Create arguments for heatmap.
         fetch_args: Get arguments passed.
