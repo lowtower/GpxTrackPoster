@@ -20,6 +20,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
+        pip uninstall -y py-staticmaps
         pip install --upgrade git+https://github.com/lowtower/py-staticmaps.git@v0.4.1#egg=py-staticmaps
     - name: Check formatting (black)
       run: black --line-length 120 --check --diff gpxtrackposter tests scripts
