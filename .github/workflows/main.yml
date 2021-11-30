@@ -20,7 +20,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
-        pip install --upgrade git+https://github.com/flopp/py-staticmaps@f3bd3c2977b82a32d0a705d32c296e09ea25d160
+        pip install --upgrade git+https://github.com/flopp/py-staticmaps.git@f3bd3c2977b82a32d0a705d32c296e09ea25d160
     - name: Check formatting (black)
       run: black --line-length 120 --check --diff gpxtrackposter tests scripts
     - name: Lint (pylint)
