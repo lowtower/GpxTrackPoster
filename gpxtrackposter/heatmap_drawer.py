@@ -8,6 +8,7 @@ import argparse
 import logging
 import math
 import os
+import sys
 import uuid
 from operator import itemgetter
 from typing import Dict, List, Optional, Tuple
@@ -46,6 +47,7 @@ class HeatmapDrawer(TracksDrawer):
         self._heatmap_line_width_lower: List[Tuple[float, float]] = [(0.10, 5.0), (0.20, 2.0), (1.0, 0.30)]
         self._heatmap_line_width_upper: List[Tuple[float, float]] = [(0.02, 0.5), (0.05, 0.2), (1.0, 0.05)]
         self._heatmap_line_width: List[Tuple[float, float]] = self._heatmap_line_width_lower
+        self._heatmap_renderer: str = "pillow"
         self._tile_provider: Optional[staticmaps.TileProvider] = None
         self._tile_context: staticmaps.Context = staticmaps.Context()
         self._bg_max_size: int = 1200
@@ -75,13 +77,15 @@ class HeatmapDrawer(TracksDrawer):
             help="Define three transparency and width tuples for the heatmap lines or set it to "
             "`automatic` for automatic calculation (default: 0.1,5.0, 0.2,2.0, 1.0,0.3).",
         )
+        tile_provider = staticmaps.default_tile_providers.keys()
         group.add_argument(
             "--heatmap-tile-provider",
             dest="heatmap_tile_provider",
             metavar="TILE_PROVIDER",
             type=str,
-            choices=staticmaps.default_tile_providers.keys(),
-            help="Optionally, choose a tile provider from the list for a background map image.",
+            choices=tile_provider,
+            help="Optionally, choose a tile provider from the list for a background map image: "
+            f"{', '.join(tile_provider)}. (Default: None)",
         )
         group.add_argument(
             "--heatmap-tile-max-size",
@@ -92,6 +96,16 @@ class HeatmapDrawer(TracksDrawer):
             help="Set the maximum background image size (which is afterwards scaled to the poster size). "
             "This setting defines how much details will be shown on the map. "
             "Be sure to choose a reasonable value! (default: 1200 px)",
+        )
+        bg_renderer = ["pillow", "cairo"]
+        group.add_argument(
+            "--heatmap-tile-renderer",
+            dest="heatmap_renderer",
+            metavar="RENDERER",
+            choices=bg_renderer,
+            default=self._heatmap_renderer,
+            help=f"Choose a renderer for generating the background image, one of {', '.join(bg_renderer)}. "
+            f"(default: {self._heatmap_renderer})",
         )
 
     # pylint: disable=too-many-branches
@@ -149,10 +163,14 @@ class HeatmapDrawer(TracksDrawer):
         if args.heatmap_tile_max_size:
             self._bg_max_size = args.heatmap_tile_max_size
             if args.heatmap_tile_max_size > 4800:
-                print(
+                msg = (
                     f"A size of < {args.heatmap_tile_max_size} > pixels for the background image is very high.\n"
-                    f"Try to chose a smaller size!"
+                    "Fetching large tiles takes time and consumes much disk space.\n"
+                    "Consider choosing a smaller size!"
                 )
+                log.info(msg)
+        # set background image renderer
+        self._heatmap_renderer = args.heatmap_renderer
 
     def _get_line_transparencies_and_widths(self, bbox: s2sphere.sphere.LatLngRect) -> List[Tuple[float, float]]:
         # automatic calculation of line transparencies and widths
@@ -289,8 +307,21 @@ class HeatmapDrawer(TracksDrawer):
         #     )
         #  )
 
-        image = self._tile_context.render_pillow(bg_size.x, bg_size.y)
         try:
+            # render background image based on command line argument
+            if self._heatmap_renderer == "cairo":
+                try:
+                    __import__("cairo")
+                except ImportError:
+                    msg = (
+                        "The cairo module cannot be imported. "
+                        "Please consider choosing 'pillow' as background image renderer instead!"
+                    )
+                    sys.exit(msg)
+                image = self._tile_context.render_cairo(bg_size.x, bg_size.y)
+            else:
+                image = self._tile_context.render_pillow(bg_size.x, bg_size.y)
+            # generate a unique filename
             tmp_file = f"{uuid.uuid4()}.png"
             image.save(tmp_file)
             with open(tmp_file, "rb") as f:
