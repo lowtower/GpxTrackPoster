@@ -8,8 +8,9 @@ import argparse
 import calendar
 import datetime
 import math
-import typing
+from typing import List
 
+import pint  # type: ignore
 import svgwrite  # type: ignore
 
 from gpxtrackposter import utils
@@ -188,13 +189,13 @@ class ClockDrawer(TracksDrawer):
         self,
         dr: svgwrite.Drawing,
         g: svgwrite.container.Group,
-        tracks: typing.List[Track],
+        tracks: List[Track],
         radius: float,
         center: XY,
         values: str = "",
         key_times: str = "",
     ) -> None:
-        length = sum([t.length() for t in tracks])
+        length = pint.quantity.Quantity(sum([t.length() for t in tracks]))
         has_special = len([t for t in tracks if t.special]) > 0
         color = self.color(self.poster.length_range_by_date, length, has_special)
 
