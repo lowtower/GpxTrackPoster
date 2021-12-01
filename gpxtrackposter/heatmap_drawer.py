@@ -168,7 +168,7 @@ class HeatmapDrawer(TracksDrawer):
                     "Fetching large tiles takes time and consumes much disk space.\n"
                     "Consider choosing a smaller size!"
                 )
-                log.info(msg)
+                log.warning(msg)
         # set background image renderer
         self._heatmap_renderer = args.heatmap_renderer
 
