@@ -308,6 +308,9 @@ class HeatmapDrawer(TracksDrawer):
         #  )
 
         try:
+            # generate a unique filename
+            tmp_file = f"{uuid.uuid4()}.png"
+
             # render background image based on command line argument
             if self._heatmap_renderer == "cairo":
                 try:
@@ -319,11 +322,10 @@ class HeatmapDrawer(TracksDrawer):
                     )
                     sys.exit(msg)
                 image = self._tile_context.render_cairo(bg_size.x, bg_size.y)
+                image.write_to_png(tmp_file)
             else:
                 image = self._tile_context.render_pillow(bg_size.x, bg_size.y)
-            # generate a unique filename
-            tmp_file = f"{uuid.uuid4()}.png"
-            image.save(tmp_file)
+                image.save(tmp_file)
             with open(tmp_file, "rb") as f:
                 img_inl = staticmaps.SvgRenderer.create_inline_image(f.read())
                 dr.add(dr.image(img_inl, insert=(offset.x, offset.y), size=(size.x, size.y)))
