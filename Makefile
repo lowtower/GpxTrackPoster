@@ -33,6 +33,8 @@ lint:
 	    --check \
 	    --diff \
 	    gpxtrackposter tests scripts
+	.env/bin/flake8 \
+	    gpxtrackposter tests scripts
 	.env/bin/pylint \
 	    gpxtrackposter tests scripts
 	.env/bin/mypy \
@@ -46,7 +48,7 @@ test:
 
 .PHONY: coverage
 coverage:
-	.env/bin/pytest --cov=gpxtrackposter --cov-report=term --cov-report=html tests
+	.env/bin/pytest --cov=gpxtrackposter --cov-branch --cov-report=term --cov-report=html tests
 
 .PHONY: extract-messages
 extract-messages:
