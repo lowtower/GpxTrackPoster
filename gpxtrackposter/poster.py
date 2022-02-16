@@ -162,7 +162,7 @@ class Poster:
         """Set the Poster's drawer and draw the tracks."""
         self.tracks_drawer = drawer
         d = svgwrite.Drawing(output, (f"{self.width}mm", f"{self.height}mm"))
-        d.viewbox(0, 0, self.width, self.height)
+        d.viewbox(width=self.width, height=self.height)
         d.add(d.rect((0, 0), (self.width, self.height), fill=self.colors["background"]))
         self._draw_header(d)
         self._draw_footer(d)
@@ -250,9 +250,10 @@ class Poster:
                 style=small_value_style,
             )
         )
+        weekly = len(self.tracks) / weeks if weeks else 0.0
         g.add(
             d.text(
-                self.translate("Weekly") + ": " + format_float(len(self.tracks) / weeks),
+                self.translate("Weekly") + ": " + format_float(weekly),
                 insert=(120, self.height - 10),
                 fill=text_color,
                 style=small_value_style,
@@ -312,9 +313,10 @@ class Poster:
             length_range.extend(t.length())
             # time.isocalendar()[1] -> week number
             weeks[(t.start_time().year, t.start_time().isocalendar()[1])] = 1
+        average_length = total_length / len(self.tracks) if self.tracks else 0.0 * Units().meter
         return (
             total_length,
-            total_length / len(self.tracks),
+            average_length,
             length_range,
             len(weeks),
         )
