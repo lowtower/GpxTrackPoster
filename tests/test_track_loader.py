@@ -10,7 +10,7 @@ import datetime
 import json
 import os
 from pathlib import Path
-from typing import Union, Dict, List
+from typing import Dict, List, Union
 from unittest.mock import MagicMock
 
 import pytest
