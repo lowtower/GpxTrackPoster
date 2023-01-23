@@ -6,7 +6,7 @@
 
 import datetime
 import re
-import typing
+from typing import Generator, Optional
 
 
 class YearRange:
@@ -24,25 +24,25 @@ class YearRange:
     """
 
     def __init__(self) -> None:
-        """Inits YearRange with empty bounds -- to be built after init"""
-        self.from_year: typing.Optional[int] = None
-        self.to_year: typing.Optional[int] = None
+        """Initialises a YearRange with empty bounds -- to be built after init"""
+        self.from_year: Optional[int] = None
+        self.to_year: Optional[int] = None
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, YearRange) and self.from_year == other.from_year and self.to_year == other.to_year
 
     def parse(self, s: str) -> bool:
-        """Parse a plaintext range of years into a pair of years
+        """Parse a plaintext range of years into a pair of years.
 
         Attempt to turn the input string into a pair of year values, from_year and to_year. If one
         year is passed, both from_year and to_year will be set to that year. If a range like
         '2016-2018' is passed, from_year will be set to 2016, and to_year will be set to 2018.
 
         Args:
-            s: A string representing a range of years or a single year
+            s: A string representing a range of years or a single year.
 
         Returns:
-            True if the range was successfully parsed, False if not.
+            bool: True if the range was successfully parsed, False if not.
         """
         if s == "all":
             self.from_year = None
@@ -63,11 +63,16 @@ class YearRange:
         return False
 
     def clear(self) -> None:
+        """Clear values of year range."""
         self.from_year = None
         self.to_year = None
 
     def add(self, t: datetime.datetime) -> None:
-        """For the given t, update from_year and to_year to include that timestamp"""
+        """For the given t, update from_year and to_year to include that timestamp.
+
+        Args:
+            t: time to be added to year range.
+        """
         if self.from_year is None:
             self.from_year = t.year
             self.to_year = t.year
@@ -81,7 +86,14 @@ class YearRange:
             self.to_year = t.year
 
     def contains(self, t: datetime.datetime) -> bool:
-        """Return True if current year range contains t, False if not"""
+        """Return True if current year range contains t, False if not.
+
+        Args:
+            t: Time to be checked against containment of year range.
+
+        Returns:
+            bool: year range contains the time or not.
+        """
         if self.from_year is None:
             return True
 
@@ -90,14 +102,23 @@ class YearRange:
         return self.from_year <= t.year <= self.to_year
 
     def count(self) -> int:
-        """Return number of years contained in the current range"""
+        """Return number of years contained in the current range.
+
+        Returns:
+            int: The number of years in the year range.
+        """
         if self.from_year is None:
             return 0
 
         assert self.to_year is not None
         return 1 + self.to_year - self.from_year
 
-    def iter(self) -> typing.Generator[int, None, None]:
+    def iter(self) -> Generator[int, None, None]:
+        """Iterate the year range.
+
+        Yields:
+            Generator[int, None, None]: Generator object yielding the years in the year range.
+        """
         if self.from_year is None:
             return
 

@@ -4,7 +4,7 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import typing
+from typing import Optional
 
 
 class ValueRange:
@@ -27,30 +27,60 @@ class ValueRange:
     """
 
     def __init__(self) -> None:
-        self._lower: typing.Optional[float] = None
-        self._upper: typing.Optional[float] = None
+        self._lower: Optional[float] = None
+        self._upper: Optional[float] = None
 
     @classmethod
     def from_pair(cls, value1: float, value2: float) -> "ValueRange":
+        """Create a value range from a pair of values.
+
+        Args:
+            value1: First value.
+            value2: Second value.
+
+        Returns:
+            ValueRange: Created value range
+        """
         r = cls()
         r.extend(value1)
         r.extend(value2)
         return r
 
     def clear(self) -> None:
+        """Clear values of value range"""
         self._lower = None
         self._upper = None
 
     def is_valid(self) -> bool:
+        """Checks whether the value range is valid or not.
+
+        Returns:
+            bool: Is the value range valid or not.
+        """
         return self._lower is not None
 
-    def lower(self) -> typing.Optional[float]:
+    def lower(self) -> Optional[float]:
+        """Returns the lower value of the value range.
+
+        Returns:
+            Optional[float]: The lower value of the value range.
+        """
         return self._lower
 
-    def upper(self) -> typing.Optional[float]:
+    def upper(self) -> Optional[float]:
+        """Returns the upper value of the value range.
+
+        Returns:
+            Optional[float]: The upper value of the value range.
+        """
         return self._upper
 
     def diameter(self) -> float:
+        """Returns the diameter value of the value range.
+
+        Returns:
+            Optional[float]: The diameter value of the value range.
+        """
         if self.is_valid():
             assert self._upper is not None
             assert self._lower is not None
@@ -58,6 +88,14 @@ class ValueRange:
         return 0
 
     def contains(self, value: float) -> bool:
+        """Checks whether the value range contains the given value.
+
+        Args:
+            value: Value to be checked against containment of value range.
+
+        Returns:
+            bool: Value range contains the value or not.
+        """
         if not self.is_valid():
             return False
 
@@ -66,6 +104,11 @@ class ValueRange:
         return self._lower <= value <= self._upper
 
     def extend(self, value: float) -> None:
+        """Extend the value range contains with the given value.
+
+        Args:
+            value: Value to extend the value range with.
+        """
         if not self.is_valid():
             self._lower = value
             self._upper = value
@@ -76,6 +119,17 @@ class ValueRange:
             self._upper = max(self._upper, value)
 
     def interpolate(self, relative: float) -> float:
+        """Interpolate the value range with the given relative value.
+
+        Args:
+            relative: Value to interpolate the quantity range with.
+
+        Returns:
+            float: The interpolated value of the value range.
+
+        Raises:
+            ValueError: Value range cannot be interpolated.
+        """
         if not self.is_valid():
             raise ValueError("Cannot interpolate invalid ValueRange")
         assert self._lower is not None
@@ -83,6 +137,17 @@ class ValueRange:
         return self._lower + relative * (self._upper - self._lower)
 
     def relative_position(self, value: float) -> float:
+        """Get the relative position of the given value within the value range.
+
+        Args:
+            value: Value to get the relative position for.
+
+        Returns:
+            float: The relative position within the value range.
+
+        Raises:
+            ValueError: Relative position cannot be evaluated from the value range.
+        """
         if not self.is_valid():
             raise ValueError("Cannot get relative_position for invalid ValueRange")
         assert self._lower is not None

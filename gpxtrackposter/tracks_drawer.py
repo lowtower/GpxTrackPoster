@@ -22,16 +22,41 @@ class TracksDrawer:
         self.poster = the_poster
 
     def create_args(self, args_parser: argparse.ArgumentParser) -> None:
-        """Add arguments to the parser"""
+        """Add arguments to the parser.
+
+        Args:
+            args_parser: ArgumentParser
+        """
 
     def fetch_args(self, args: argparse.Namespace) -> None:
-        """Get arguments from the parser"""
+        """Get arguments from the parser.
+
+        Args:
+            args: Namespace
+
+        """
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
-        """Draw the circular Poster using distances broken down by time"""
+        """Draw the circular Poster using distances broken down by time.
+
+        Args:
+            dr: svg drawing
+            g: svg group
+            size: Size
+            offset: Offset
+        """
 
     def color(self, length_range: QuantityRange, length: pint.Quantity, is_special: bool = False) -> str:
-        """Define special colors"""
+        """Define special color.
+
+        Args:
+            length_range: length range for special color.
+            length: length for special color.
+            is_special: special track for special color.
+
+        Returns:
+            str: Track color.
+        """
         color1 = self.poster.colors["special"] if is_special else self.poster.colors["track"]
         color2 = self.poster.colors["special2"] if is_special else self.poster.colors["track2"]
         return utils.interpolate_color(color1, color2, length_range.relative_position(length))
