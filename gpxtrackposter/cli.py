@@ -78,12 +78,24 @@ def main() -> None:
 
 
 def parse_args(args_parser: argparse.ArgumentParser, args: list) -> argparse.Namespace:
-    """Parse arguments"""
+    """Parse arguments
+
+    Args:
+        args_parser: Argument parser
+        args: arguments
+
+    Returns:
+        object: Namespace
+    """
     return args_parser.parse_args(args)
 
 
 def create_parser() -> argparse.ArgumentParser:
-    """Add arguments to the parser"""
+    """Add arguments to the parser
+
+    Returns:
+        object: ArgumentParser
+    """
     args_parser = argparse.ArgumentParser(prog=__app_name__)
     args_parser.add_argument(
         "--gpx-dir",

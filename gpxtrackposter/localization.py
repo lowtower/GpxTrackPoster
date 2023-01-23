@@ -14,9 +14,12 @@ def localized_day_of_week_name(day_of_week: int, short: bool) -> str:
     """
     Return a localized name gor a given weekday
 
-    day_of_week: integer representing the weekday (0-6)
-    short: if True, return short name
-    return: full or short localized name of weekday
+    Args:
+        day_of_week: integer representing the weekday (0-6)
+        short: if True, return short name
+
+    Returns:
+        str: full or short localized name of weekday
     """
     assert 0 <= day_of_week <= 6
 
