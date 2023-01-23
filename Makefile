@@ -2,7 +2,7 @@ PROJECT = gpxtrackposter
 SRC_CORE = gpxtrackposter
 SRC_SCRIPTS = scripts
 SRC_TEST = tests
-SRC_COMPLETE = $(SRC_CORE) $(SRC_TEST) $(SRC_SCRIPTS)
+SRC_COMPLETE = $(SRC_CORE) $(SRC_TEST) $(SRC_SCRIPTS) docs/gen_ref_pages.py
 COPYRIGHT_FILES = $(SRC_CORE) $(SRC_TEST) $(SRC_SCRIPTS) README.md LICENSE
 PYTHON=python3
 PIP=$(PYTHON) -m pip
@@ -118,3 +118,8 @@ compile-messages: ## compile messages
 	msgfmt -o locale/fr_FR/LC_MESSAGES/gpxposter.mo locale/fr_FR/LC_MESSAGES/gpxposter
 	msgfmt -o locale/ru_RU/LC_MESSAGES/gpxposter.mo locale/ru_RU/LC_MESSAGES/gpxposter
 	msgfmt -o locale/zh_CN/LC_MESSAGES/gpxposter.mo locale/zh_CN/LC_MESSAGES/gpxposter
+
+.PHONY: documentation
+documentation: ## Generate documentation
+	@if type mkdocs >/dev/null 2>&1 ; then .env/bin/python -m mkdocs build --clean --verbose ; \
+	 else echo "SKIPPED. Run '$(PIP) install mkdocs' first." >&2 ; fi 

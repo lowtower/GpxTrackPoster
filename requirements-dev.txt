@@ -18,6 +18,17 @@ pytest
 pytest-cov
 pytest-mock
 
+# Documentation
+mkdocs
+mkdocstrings
+mkdocstrings-python
+mkdocs-gen-files
+mkdocs-literate-nav
+mkdocs-material
+mkdocs-section-index
+Pygments
+
+# Misc
 python-dateutil
 types-python-dateutil
 types-pytz
