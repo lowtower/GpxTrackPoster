@@ -19,13 +19,24 @@ from gpxtrackposter.xy import XY
 
 
 class GithubDrawer(TracksDrawer):
-    """Draw a github profile-like poster"""
+    """Draw a gitHub profile-like poster.
+
+    Methods:
+        draw: Iterate through the Poster's years, creating a calendar for each.
+    """
 
     def __init__(self, the_poster: Poster):
         super().__init__(the_poster)
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
-        """Iterate through the Poster's years, creating a calendar for each."""
+        """Iterate through the Poster's years, creating a calendar for each.
+
+        Args:
+            dr: svg drawing
+            g: svg group
+            size: Size
+            offset: Offset
+        """
         if len(self.poster.tracks) == 0:
             raise PosterError("No tracks to draw.")
         year_size = 200 * 4.0 / 80.0
