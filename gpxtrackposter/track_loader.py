@@ -1,6 +1,5 @@
 """Handle parsing of GPX files and writing/loading of cached data"""
 
-
 # Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -13,8 +12,7 @@ import json
 import logging
 import os
 import shutil
-import typing
-from typing import Any
+from typing import Any, Dict, Generator, List, Optional
 
 import pint  # type: ignore
 import s2sphere  # type: ignore
@@ -30,7 +28,15 @@ log = logging.getLogger(__name__)
 
 
 def load_gpx_file(file_name: str, timezone_adjuster: TimezoneAdjuster) -> Track:
-    """Load an individual GPX file as a track by using Track.load_gpx()"""
+    """Load an individual GPX file as a track by using Track.load_gpx()
+
+    Args:
+        file_name: An individual GPX file.
+        timezone_adjuster: TimezoneAdjuster
+
+    Returns:
+        Track: Generated track object from gpx file.
+    """
     log.info("Loading track %s...", os.path.basename(file_name))
     t = Track()
     t.load_gpx(file_name, timezone_adjuster)
@@ -38,7 +44,18 @@ def load_gpx_file(file_name: str, timezone_adjuster: TimezoneAdjuster) -> Track:
 
 
 def load_cached_track_file(cache_file_name: str, file_name: str) -> Track:
-    """Load an individual track from cache files"""
+    """Load an individual track from cache files.
+
+    Args:
+        cache_file_name: Cache file name.
+        file_name: An individual GPX file name.
+
+    Returns:
+        Track: Cached track object.
+
+    Raises:
+        TrackLoadError: Track could not be loaded from cache.
+    """
     try:
         t = Track()
         t.load_cache(cache_file_name)
@@ -64,21 +81,30 @@ class TrackLoader:
         load_tracks: Load all data from cache and GPX files
     """
 
-    def __init__(self, workers: typing.Optional[int]) -> None:
-        self._workers = workers
+    def __init__(self, workers: Optional[int]) -> None:
+        self._workers: Optional[int] = workers
         self._min_length: pint.Quantity = 1 * Units().km
-        self.special_file_names: typing.List[str] = []
-        self.year_range = YearRange()
-        self.cache_dir: typing.Optional[str] = None
-        self.strava_cache_file = ""
-        self._cache_file_names: typing.Dict[str, str] = {}
+        self.special_file_names: List[str] = []
+        self.year_range: YearRange = YearRange()
+        self.cache_dir: Optional[str] = None
+        self.strava_cache_file: str = ""
+        self._cache_file_names: Dict[str, str] = {}
         self._activity_type: str = "all"
 
     def set_cache_dir(self, cache_dir: str) -> None:
+        """Set the path to the cache directory.
+
+        Args:
+            cache_dir: The path to the cache directory.
+        """
         self.cache_dir = cache_dir
 
     def clear_cache(self) -> None:
-        """Remove cache directory, if it exists"""
+        """Remove cache directory, if it exists.
+
+        Raises:
+            OSError: If directory could not be removed.
+        """
         if self.cache_dir is not None and os.path.isdir(self.cache_dir):
             log.info("Removing cache dir: %s", self.cache_dir)
             try:
@@ -87,20 +113,37 @@ class TrackLoader:
                 log.error("Failed: %s", str(e))
 
     def set_min_length(self, min_length: pint.Quantity) -> None:
+        """Set the minimum length.
+
+        Args:
+            min_length: Minimum length.
+        """
         self._min_length = min_length
 
     def set_activity(self, activity_type: str) -> None:
+        """Set the activity type.
+
+        Args:
+            activity_type: Activity type.
+        """
         self._activity_type = activity_type.lower()
 
-    def load_tracks(self, base_dir: str) -> typing.List[Track]:
-        """Load tracks base_dir and return as a List of tracks"""
+    def load_tracks(self, base_dir: str) -> List[Track]:
+        """Load tracks base_dir and return as a List of tracks.
+
+        Args:
+            base_dir: Base directory with gpx files.
+
+        Returns:
+            List[Track]: A List of tracks.
+        """
         file_names = list(self._list_gpx_files(base_dir))
         log.info("GPX files: %d", len(file_names))
 
-        tracks: typing.List[Track] = []
+        tracks: List[Track] = []
 
         # load track from cache
-        cached_tracks: typing.Dict[str, Track] = {}
+        cached_tracks: Dict[str, Track] = {}
         if self.cache_dir:
             log.info("Trying to load %d track(s) from cache...", len(file_names))
             cached_tracks = self._load_tracks_from_cache(file_names)
@@ -119,7 +162,7 @@ class TrackLoader:
 
         return self._filter_and_merge_tracks(tracks)
 
-    def load_strava_tracks(self, strava_config: str) -> typing.List[Track]:
+    def load_strava_tracks(self, strava_config: str) -> List[Track]:
         tracks = []
         tracks_names = []
         if self.cache_dir:
@@ -154,7 +197,7 @@ class TrackLoader:
         self._store_strava_tracks_to_cache(tracks)
         return self._filter_and_merge_tracks(tracks)
 
-    def _filter_tracks(self, tracks: typing.List[Track]) -> typing.List[Track]:
+    def _filter_tracks(self, tracks: List[Track]) -> List[Track]:
         filtered_tracks = []
         for t in tracks:
             file_name = t.file_names[0]
@@ -169,7 +212,7 @@ class TrackLoader:
                 filtered_tracks.append(t)
         return filtered_tracks
 
-    def _filter_and_merge_tracks(self, tracks: typing.List[Track]) -> typing.List[Track]:
+    def _filter_and_merge_tracks(self, tracks: List[Track]) -> List[Track]:
         tracks = self._filter_tracks(tracks)
         # merge tracks that took place within one hour
         tracks = self._merge_tracks(tracks)
@@ -180,7 +223,7 @@ class TrackLoader:
         return tracks
 
     @staticmethod
-    def _merge_tracks(tracks: typing.List[Track]) -> typing.List[Track]:
+    def _merge_tracks(tracks: List[Track]) -> List[Track]:
         log.info("Merging tracks...")
         tracks = sorted(tracks, key=lambda t1: t1.start_time())
         merged_tracks = []
@@ -198,9 +241,7 @@ class TrackLoader:
         log.info("Merged %d track(s)", len(tracks) - len(merged_tracks))
         return merged_tracks
 
-    def _load_tracks(
-        self, file_names: typing.List[str], timezone_adjuster: TimezoneAdjuster
-    ) -> typing.Dict[str, Track]:
+    def _load_tracks(self, file_names: List[str], timezone_adjuster: TimezoneAdjuster) -> Dict[str, Track]:
         tracks = {}
 
         if self._workers is not None and self._workers <= 1:
@@ -228,7 +269,7 @@ class TrackLoader:
 
         return tracks
 
-    def _load_tracks_from_cache(self, file_names: typing.List[str]) -> typing.Dict[str, Track]:
+    def _load_tracks_from_cache(self, file_names: List[str]) -> Dict[str, Track]:
         tracks = {}
 
         if self._workers is not None and self._workers <= 1:
@@ -259,7 +300,7 @@ class TrackLoader:
 
         return tracks
 
-    def _store_tracks_to_cache(self, tracks: typing.Dict[str, Track]) -> None:
+    def _store_tracks_to_cache(self, tracks: Dict[str, Track]) -> None:
         if (not tracks) or (not self.cache_dir):
             return
 
@@ -272,7 +313,7 @@ class TrackLoader:
             else:
                 log.info("Stored track %s to cache", file_name)
 
-    def _store_strava_tracks_to_cache(self, tracks: typing.List[Track]) -> None:
+    def _store_strava_tracks_to_cache(self, tracks: List[Track]) -> None:
         if (not tracks) or (not self.cache_dir):
             return
         dirname = os.path.dirname(self.strava_cache_file)
@@ -284,7 +325,7 @@ class TrackLoader:
             json.dump(to_cache_tracks, f)
 
     @staticmethod
-    def _make_strava_cache_dict(track: Track) -> typing.Dict[str, Any]:
+    def _make_strava_cache_dict(track: Track) -> Dict[str, Any]:
         lines_data = []
         for line in track.polylines:
             lines_data.append([{"lat": latlng.lat().degrees, "lng": latlng.lng().degrees} for latlng in line])
@@ -297,7 +338,7 @@ class TrackLoader:
         }
 
     @staticmethod
-    def _strava_cache_to_track(data: typing.Dict[str, Any]) -> "Track":
+    def _strava_cache_to_track(data: Dict[str, Any]) -> "Track":
         t = Track()
         t.file_names = [data["name"]]
         t.set_start_time(datetime.datetime.strptime(data["start"], "%Y-%m-%d %H:%M:%S"))
@@ -309,7 +350,7 @@ class TrackLoader:
         return t
 
     @staticmethod
-    def _list_gpx_files(base_dir: str) -> typing.Generator[str, None, None]:
+    def _list_gpx_files(base_dir: str) -> Generator[str, None, None]:
         base_dir = os.path.abspath(base_dir)
         if not os.path.isdir(base_dir):
             raise ParameterError(f"Not a directory: {base_dir}")

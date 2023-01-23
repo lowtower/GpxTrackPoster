@@ -19,13 +19,24 @@ from gpxtrackposter.xy import XY
 
 
 class CalendarDrawer(TracksDrawer):
-    """Draw a calendar poster."""
+    """Draw a calendar poster.
+
+    Methods:
+        draw: Iterate through the Poster's years, creating a calendar for each.
+    """
 
     def __init__(self, the_poster: Poster):
         super().__init__(the_poster)
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
-        """Iterate through the Poster's years, creating a calendar for each."""
+        """Iterate through the Poster's years, creating a calendar for each.
+
+        Args:
+            dr: svg drawing
+            g: svg group
+            size: Size
+            offset: Offset
+        """
         if len(self.poster.tracks) == 0:
             raise PosterError("No tracks to draw.")
         years = self.poster.years.count()
@@ -52,6 +63,15 @@ class CalendarDrawer(TracksDrawer):
                 y += 1
 
     def _draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY, year: int) -> None:
+        """Create a calendar for the given year.
+
+        Args:
+            dr: svg drawing
+            g: svg group
+            size: Size
+            offset: Offset
+            year: Year
+        """
         min_size = min(size.x, size.y)
         year_size = min_size * 4.0 / 80.0
         year_style = f"font-size:{year_size}px; font-family:Arial;"
