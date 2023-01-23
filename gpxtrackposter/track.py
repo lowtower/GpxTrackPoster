@@ -7,7 +7,7 @@
 import datetime
 import json
 import os
-import typing
+from typing import List, Optional
 
 import gpxpy  # type: ignore
 import pint  # type: ignore
@@ -41,17 +41,17 @@ class Track:
     """
 
     def __init__(self) -> None:
-        self.file_names: typing.List[str] = []
-        self.polylines: typing.List[typing.List[s2sphere.LatLng]] = []
-        self._start_time: typing.Optional[datetime.datetime] = None
-        self._end_time: typing.Optional[datetime.datetime] = None
+        self.file_names: List[str] = []
+        self.polylines: List[List[s2sphere.LatLng]] = []
+        self._start_time: Optional[datetime.datetime] = None
+        self._end_time: Optional[datetime.datetime] = None
         # Don't use Units().meter here, as this constructor is called from
         # within a thread (which would create a second unit registry!)
         self._length_meters = 0.0
         self.special = False
         self.activity_type = None
 
-    def load_gpx(self, file_name: str, timezone_adjuster: typing.Optional[TimezoneAdjuster]) -> None:
+    def load_gpx(self, file_name: str, timezone_adjuster: Optional[TimezoneAdjuster]) -> None:
         """Load the GPX file into self.
 
         Args:
@@ -80,6 +80,11 @@ class Track:
             raise TrackLoadError("Something went wrong when loading GPX.") from e
 
     def load_strava(self, activity: StravaActivity) -> None:
+        """Load Strava activity into self.
+
+        Args:
+            activity: Strava activity
+        """
         # use strava as file name
         self.file_names = [str(activity.id)]
         self.set_start_time(activity.start_date_local)
@@ -90,42 +95,86 @@ class Track:
         self.polylines = [[s2sphere.LatLng.from_degrees(p[0], p[1]) for p in polyline_data]]
 
     def has_time(self) -> bool:
+        """Check whether the track has at least one time, either start or end time.
+
+        Returns:
+            bool: True if track has at least one time, either start or end time.
+        """
         return self._start_time is not None and self._end_time is not None
 
     def start_time(self) -> datetime.datetime:
+        """Return the start time.
+
+        Returns:
+            datetime.datetime: The start time.
+        """
         assert self._start_time is not None
         return self._start_time
 
     def set_start_time(self, value: datetime.datetime) -> None:
+        """Set the start time to the given value.
+
+        Args:
+            value: The start time value.
+        """
         self._start_time = value
 
     def end_time(self) -> datetime.datetime:
+        """Return the end time.
+
+        Returns:
+            datetime.datetime: The end time.
+        """
         assert self._end_time is not None
         return self._end_time
 
     def set_end_time(self, value: datetime.datetime) -> None:
+        """Set the end time to the given value.
+
+        Args:
+            value: The end time value.
+        """
         self._end_time = value
 
     @property
     def length_meters(self) -> float:
+        """Return the track length in meters.
+
+        Returns:
+            float: The track length in meters.
+        """
         return self._length_meters
 
     @length_meters.setter
     def length_meters(self, value: float) -> None:
+        """Set the track length in meters to the given value.
+
+        Args:
+            value: The track length in meters.
+        """
         self._length_meters = value
 
     def length(self) -> pint.Quantity:
+        """Return the track length.
+
+        Returns:
+            pint.Quantity: The track length.
+        """
         return self._length_meters * Units().meter
 
     def bbox(self) -> s2sphere.LatLngRect:
-        """Compute the smallest rectangle that contains the entire track (border box)."""
+        """Compute the smallest rectangle that contains the entire track (border box).
+
+        Returns:
+            s2sphere.LatLngRect: The smallest rectangle that contains the entire track (border box).
+        """
         bbox = s2sphere.LatLngRect()
         for line in self.polylines:
             for latlng in line:
                 bbox = bbox.union(s2sphere.LatLngRect.from_point(latlng.normalized()))
         return bbox
 
-    def _load_gpx_data(self, gpx: gpxpy.gpx.GPX, timezone_adjuster: typing.Optional[TimezoneAdjuster]) -> None:
+    def _load_gpx_data(self, gpx: gpxpy.gpx.GPX, timezone_adjuster: Optional[TimezoneAdjuster]) -> None:
         self._start_time, self._end_time = gpx.get_time_bounds()
         if not self.has_time():
             raise TrackLoadError("Track has no start or end time.")
@@ -146,7 +195,11 @@ class Track:
             self.activity_type = gpx.tracks[0].type.lower()
 
     def append(self, other: "Track") -> None:
-        """Append other track to self."""
+        """Append other track to self.
+
+        Args:
+            other: Other track to append.
+        """
         self._end_time = other.end_time()
         self.polylines.extend(other.polylines)
         self._length_meters += other.length_meters
@@ -177,7 +230,11 @@ class Track:
             raise TrackLoadError("Failed to load track data from cache.") from e
 
     def store_cache(self, cache_file_name: str) -> None:
-        """Cache the current track"""
+        """Cache the current track.
+
+        Args:
+            cache_file_name: The name of the cache file.
+        """
         dir_name = os.path.dirname(cache_file_name)
         if not os.path.isdir(dir_name):
             os.makedirs(dir_name)

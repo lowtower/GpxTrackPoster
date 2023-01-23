@@ -8,7 +8,7 @@ import argparse
 import calendar
 import datetime
 import math
-import typing
+from typing import List, Optional
 
 import pint  # type: ignore
 import svgwrite  # type: ignore
@@ -29,6 +29,8 @@ class CircularDrawer(TracksDrawer):
     Attributes:
         _rings: True if distance rings should be drawn, else False.
         _ring_color: Color of distance rings.
+        _max_distance: Maximum distance of tracks.
+        _unit: Unit system.
 
     Methods:
         create_args: Set up an argparser for circular poster options.
@@ -41,13 +43,17 @@ class CircularDrawer(TracksDrawer):
 
         Note that these can be overridden via arguments when calling."""
         super().__init__(the_poster)
-        self._rings = False
-        self._ring_color = "darkgrey"
-        self._max_distance = None
-        self._unit = Units().km
+        self._rings: bool = False
+        self._ring_color: str = "darkgrey"
+        self._max_distance: Optional[pint.Quantity] = None
+        self._unit: pint.Unit = Units().km
 
     def create_args(self, args_parser: argparse.ArgumentParser) -> None:
-        """Add arguments to the parser"""
+        """Add arguments to the parser
+
+        Args:
+            args_parser: Argument parser
+        """
         group = args_parser.add_argument_group("Circular Type Options")
         group.add_argument(
             "--circular-rings",
@@ -73,7 +79,11 @@ class CircularDrawer(TracksDrawer):
         )
 
     def fetch_args(self, args: argparse.Namespace) -> None:
-        """Get arguments from the parser"""
+        """Get arguments from the parser
+
+        Args:
+            args: Namespace
+        """
         self._rings = args.circular_rings
         self._ring_color = args.circular_ring_color
         if args.circular_ring_max_distance:
@@ -85,7 +95,14 @@ class CircularDrawer(TracksDrawer):
             self._max_distance = self._max_distance * self._unit
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
-        """Draw the circular Poster using distances broken down by time"""
+        """Draw the circular Poster using distances broken down by time.
+
+        Args:
+            dr: svg drawing
+            g: svg group
+            size: Size
+            offset: Offset
+        """
         if len(self.poster.tracks) == 0:
             raise PosterError("No tracks to draw.")
         if self.poster.length_range_by_date is None:
@@ -199,7 +216,7 @@ class CircularDrawer(TracksDrawer):
             day += 1
             date += datetime.timedelta(1)
 
-    def _determine_ring_distance(self, max_length: pint.Quantity) -> typing.Optional[pint.Quantity]:
+    def _determine_ring_distance(self, max_length: pint.Quantity) -> Optional[pint.Quantity]:
         ring_distance = None
         for distance in [1.0 * self._unit, 5.0 * self._unit, 10.0 * self._unit, 50.0 * self._unit]:
             if max_length < distance:
@@ -242,7 +259,7 @@ class CircularDrawer(TracksDrawer):
         self,
         dr: svgwrite.Drawing,
         g: svgwrite.container.Group,
-        tracks: typing.List[Track],
+        tracks: List[Track],
         a1: float,
         a2: float,
         rr: ValueRange,

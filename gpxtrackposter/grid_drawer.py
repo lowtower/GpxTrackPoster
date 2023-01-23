@@ -4,7 +4,7 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import typing
+from typing import Dict
 
 import svgwrite  # type: ignore
 
@@ -27,7 +27,14 @@ class GridDrawer(TracksDrawer):
         super().__init__(the_poster)
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
-        """For each track, draw it on the poster."""
+        """For each track, draw it on the poster.
+
+        Args:
+            dr: svg drawing
+            g: svg group
+            size: Size
+            offset: Offset
+        """
         if len(self.poster.tracks) == 0:
             raise PosterError("No tracks to draw.")
         cell_size, counts = utils.compute_grid(len(self.poster.tracks), size)
@@ -38,7 +45,7 @@ class GridDrawer(TracksDrawer):
         spacing_y = 0 if count_y <= 1 else (size.y - cell_size * count_y) / (count_y - 1)
         offset.x += (size.x - count_x * cell_size - (count_x - 1) * spacing_x) / 2
         offset.y += (size.y - count_y * cell_size - (count_y - 1) * spacing_y) / 2
-        year_groups: typing.Dict[int, svgwrite.container.Group] = {}
+        year_groups: Dict[int, svgwrite.container.Group] = {}
         for (index, tr) in enumerate(self.poster.tracks):
             year = tr.start_time().year
             if year not in year_groups:
@@ -57,6 +64,14 @@ class GridDrawer(TracksDrawer):
             )
 
     def _draw_track(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, tr: Track, size: XY, offset: XY) -> None:
+        """Draw a single track.
+
+        Args:
+            dr: svg drawing
+            g: svg group
+            size: Size
+            offset: Offset
+        """
         color = self.color(self.poster.length_range, tr.length(), tr.special)
         str_length = utils.format_float(self.poster.m2u(tr.length()))
 

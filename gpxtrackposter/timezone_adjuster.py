@@ -1,10 +1,11 @@
+"""TimezoneAdjuster"""
 # Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
 import datetime
-import typing
+from typing import Optional
 
 import pytz
 import s2sphere  # type: ignore
@@ -12,7 +13,16 @@ import timezonefinder  # type: ignore
 
 
 class TimezoneAdjuster:
-    _timezonefinder: typing.Optional[timezonefinder.TimezoneFinder] = None
+    """Represent a range of numerical values.
+
+    Attributes:
+        _timezonefinder: TimezoneFinder.
+
+    Methods:
+        adjust: Adjust Timezone if it's not set.
+    """
+
+    _timezonefinder: Optional[timezonefinder.TimezoneFinder] = None
 
     def __init__(self) -> None:
         if not TimezoneAdjuster._timezonefinder:
@@ -20,6 +30,15 @@ class TimezoneAdjuster:
 
     @classmethod
     def adjust(cls, time: datetime.datetime, latlng: s2sphere.LatLng) -> datetime.datetime:
+        """Adjust Timezone if it's not set.
+
+        Args:
+            time: Time to be adjusted.
+            latlng: Latitude and Longitude for adjustment.
+
+        Returns:
+            datetime.datetime: Adjusted time.
+        """
         # If a timezone is set, there's nothing to do.
         if time.utcoffset():
             return time
