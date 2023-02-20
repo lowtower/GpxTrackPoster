@@ -280,7 +280,7 @@ def create_parser() -> argparse.ArgumentParser:
 
 
 def setup_logging(verbose: bool = False, logfile: Optional[str] = None) -> logging.Logger:
-    """Setup logging"""
+    """Set up logging"""
     log = logging.getLogger("gpxtrackposter")
     log.setLevel(logging.INFO if verbose else logging.ERROR)
     if logfile:
@@ -290,7 +290,7 @@ def setup_logging(verbose: bool = False, logfile: Optional[str] = None) -> loggi
 
 
 def setup_loader(args: argparse.Namespace) -> track_loader.TrackLoader:
-    """Setup the tracks loader"""
+    """Set up the tracks loader"""
     loader = track_loader.TrackLoader(args.workers)
     loader.set_cache_dir(os.path.join(appdirs.user_cache_dir(__app_name__, __app_author__), "tracks"))
     if not loader.year_range.parse(args.year):
@@ -306,7 +306,7 @@ def setup_loader(args: argparse.Namespace) -> track_loader.TrackLoader:
 
 
 def setup_poster(tracks: List[track_loader.Track], args: argparse.Namespace) -> poster.Poster:
-    """Setup the poster"""
+    """Set up the poster"""
     print(f"Creating poster of type {args.type} with {len(tracks)} tracks and storing it in file {args.output}...")
     pstr = poster.Poster()
     pstr.set_language(args.language, args.localedir)
