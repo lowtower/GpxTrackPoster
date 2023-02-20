@@ -74,7 +74,10 @@ def main() -> None:
         return
 
     # setup poster
-    setup_poster(tracks, args)
+    pstr = setup_poster(tracks, args)
+
+    # draw poster
+    pstr.draw(drawers[args.type], args.output)
 
 
 def parse_args(args_parser: argparse.ArgumentParser, args: list) -> argparse.Namespace:
@@ -332,7 +335,6 @@ def setup_poster(tracks: List[track_loader.Track], args: argparse.Namespace) -> 
     pstr.set_tracks(tracks)
     if args.type == "github":
         pstr.height = 55 + pstr.years.count() * 43
-    pstr.draw(drawers[args.type], args.output)
     return pstr
 
 
