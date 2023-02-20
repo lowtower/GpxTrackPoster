@@ -163,6 +163,14 @@ class TrackLoader:
         return self._filter_and_merge_tracks(tracks)
 
     def load_strava_tracks(self, strava_config: str) -> List[Track]:
+        """
+
+        Args:
+            strava_config: Strava config file
+
+        Returns:
+            List[Track]: A List of tracks.
+        """
         tracks = []
         tracks_names = []
         if self.cache_dir:
