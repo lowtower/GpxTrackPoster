@@ -6,7 +6,6 @@ Several tests for TrackLoader
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import datetime
 import json
 import os
 from pathlib import Path
