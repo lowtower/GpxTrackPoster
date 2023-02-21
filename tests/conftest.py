@@ -66,6 +66,7 @@ def fixture_default_values() -> Namespace:
         with_animation=False,
         animation_time=30,
         workers=None,
+        from_strava=None,
     )
     return arguments
 
