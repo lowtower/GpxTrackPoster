@@ -74,7 +74,10 @@ def main() -> None:
         return
 
     # setup poster
-    setup_poster(tracks, args)
+    pstr = setup_poster(tracks, args)
+
+    # draw poster
+    pstr.draw(drawers[args.type], args.output)
 
 
 def parse_args(args_parser: argparse.ArgumentParser, args: list) -> argparse.Namespace:
@@ -308,19 +311,18 @@ def setup_loader(args: argparse.Namespace) -> track_loader.TrackLoader:
 def setup_poster(tracks: List[track_loader.Track], args: argparse.Namespace) -> poster.Poster:
     """Set up the poster"""
     print(f"Creating poster of type {args.type} with {len(tracks)} tracks and storing it in file {args.output}...")
-    pstr = poster.Poster()
-    pstr.set_language(args.language, args.localedir)
-    pstr.set_athlete(args.athlete)
-    pstr.set_title(args.title if args.title else p.translate("MY TRACKS"))
-    pstr.set_with_animation(args.with_animation)
-    pstr.set_animation_time(args.animation_time)
+    p.set_language(args.language, args.localedir)
+    p.set_athlete(args.athlete)
+    p.set_title(args.title if args.title else p.translate("MY TRACKS"))
+    p.set_with_animation(args.with_animation)
+    p.set_animation_time(args.animation_time)
 
-    pstr.special_distance = {
+    p.special_distance = {
         "special_distance": args.special_distance * Units().km,
         "special_distance2": args.special_distance2 * Units().km,
     }
 
-    pstr.colors = {
+    p.colors = {
         "background": args.background_color,
         "track": args.track_color,
         "track2": args.track_color2 or args.track_color,
@@ -328,12 +330,11 @@ def setup_poster(tracks: List[track_loader.Track], args: argparse.Namespace) -> 
         "special2": args.special_color2 or args.special_color,
         "text": args.text_color,
     }
-    pstr.units = args.units
-    pstr.set_tracks(tracks)
+    p.units = args.units
+    p.set_tracks(tracks)
     if args.type == "github":
-        pstr.height = 55 + pstr.years.count() * 43
-    pstr.draw(drawers[args.type], args.output)
-    return pstr
+        p.height = 55 + p.years.count() * 43
+    return p
 
 
 if __name__ == "__main__":
