@@ -231,7 +231,6 @@ class HeatmapDrawer(TracksDrawer):
             raise PosterError("No tracks to draw.")
         bbox = self._determine_bbox()
         size, offset = self._get_tracks_size_offset(bbox, size, offset)
-        line_transparencies_and_widths = self._get_line_transparencies_and_widths(bbox)
         year_groups: Dict[int, svgwrite.container.Group] = {}
         for tr in self.poster.tracks:
             year = tr.start_time().year
@@ -242,8 +241,9 @@ class HeatmapDrawer(TracksDrawer):
             else:
                 g_year = year_groups[year]
             color = self.color(self.poster.length_range, tr.length(), tr.special)
+            self._heatmap_line_width = self._get_line_transparencies_and_widths(bbox)
             for line in utils.project(bbox, size, offset, tr.polylines):
-                for opacity, width in line_transparencies_and_widths:
+                for opacity, width in self._heatmap_line_width:
                     g_year.add(
                         dr.polyline(
                             points=line,
@@ -280,7 +280,7 @@ class HeatmapDrawer(TracksDrawer):
 
         # get maximum track line width, scale and add to background image boundary
         scale = max([bg_size.x / size.x, bg_size.y / size.y])
-        assert self._heatmap_line_width
+        self._heatmap_line_width = self._get_line_transparencies_and_widths(bbox)
         half_stroke = round(scale * (max(self._heatmap_line_width, key=itemgetter(1))[1] / 2))
         self._tile_context.add_bounds(bbox, half_stroke)
 
@@ -309,7 +309,7 @@ class HeatmapDrawer(TracksDrawer):
         #         BLACK,
         #         1,
         #     )
-        #  )
+        # )
 
         try:
             # generate a unique filename
@@ -412,34 +412,32 @@ class HeatmapDrawer(TracksDrawer):
         """Validate and return a tuple of the Heatmap line widths.
 
         Args:
-            heatmap_line_width: Heatmap line width
+            heatmap_line_width: Heatmap line width from cli
 
         Returns:
-            list: List of tuples of line widths
+            list: List of tuples of line widths or None
 
         Raises:
             ParameterError: Not three valid TRANSPARENCY,WIDTH pairs.
             ParameterError: Not a valid TRANSPARENCY value.
         """
-        if heatmap_line_width:
-            if heatmap_line_width.lower() == "automatic":
-                self._heatmap_line_width = None
-            else:
-                trans_width_str = heatmap_line_width.split(",")
-                if len(trans_width_str) != 6:
-                    raise ParameterError(f"Not three valid TRANSPARENCY,WIDTH pairs: {heatmap_line_width}")
-                try:
-                    self._heatmap_line_width = []
-                    for value in range(0, 5, 2):
-                        transparency = float(trans_width_str[value].strip())
-                        width = float(trans_width_str[value + 1].strip())
-                        if transparency < 0 or transparency > 1:
-                            raise ParameterError(
-                                f"Not a valid TRANSPARENCY value (0 < value < 1): {transparency} in "
-                                f"{heatmap_line_width}"
-                            )
-                        self._heatmap_line_width.append((transparency, width))
-                except ValueError as e:
-                    raise ParameterError(f"Not three valid TRANSPARENCY,WIDTH pairs: {heatmap_line_width}") from e
-            return self._heatmap_line_width
-        return None
+        if not heatmap_line_width or heatmap_line_width.lower() == "automatic":
+            self._heatmap_line_width = None
+        else:
+            trans_width_str = heatmap_line_width.split(",")
+            if len(trans_width_str) != 6:
+                raise ParameterError(f"Not three valid TRANSPARENCY,WIDTH pairs: {heatmap_line_width}")
+            try:
+                self._heatmap_line_width = []
+                for value in range(0, 5, 2):
+                    transparency = float(trans_width_str[value].strip())
+                    width = float(trans_width_str[value + 1].strip())
+                    if transparency < 0 or transparency > 1:
+                        raise ParameterError(
+                            f"Not a valid TRANSPARENCY value (0 < value < 1): {transparency} in "
+                            f"{heatmap_line_width}"
+                        )
+                    self._heatmap_line_width.append((transparency, width))
+            except ValueError as e:
+                raise ParameterError(f"Not three valid TRANSPARENCY,WIDTH pairs: {heatmap_line_width}") from e
+        return self._heatmap_line_width

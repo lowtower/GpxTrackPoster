@@ -28,7 +28,7 @@ class TracksDrawer:
         pass
 
     def draw_background(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
-        """Draw background for all poster types - black rectangle"""
+        """Draw background for all poster types - rectangle with 'background' color"""
         g.add(dr.rect((offset.x, offset.y), (size.x, size.y), fill=self.poster.colors["background"]))
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
