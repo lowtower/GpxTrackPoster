@@ -1,9 +1,10 @@
 """Represent x,y values with properly overloaded operations."""
-# Copyright 2016-2021 Florian Pigorsch & Contributors. All rights reserved.
+# Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from math import isclose
 from typing import Optional, Tuple, Union
 
 
@@ -48,56 +49,61 @@ class XY:
     def __repr__(self) -> str:
         return f"XY: {self.x}/{self.y}"
 
-    def tuple(self) -> Tuple[float, float]:
-        """
-        Return a tuple with the x and y values
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, XY) and isclose(self.x, other.x) and isclose(self.y, other.y)
 
-        return: tuple with x and y values
+    def tuple(self) -> Tuple[float, float]:
+        """Return a tuple with the x and y values.
+
+        Returns:
+             Tuple[float, float]: tuple with x and y values.
         """
         return self.x, self.y
 
     def to_int(self) -> "XY":
-        """
-        Return an XY object with integer values
+        """Return an XY object with integer values.
 
-        return: XY object with integer x and y values
+        Returns:
+            XY: XY object with integer x and y values.
         """
         return XY(int(self.x), int(self.y))
 
     def round(self, n: Optional[int] = None) -> "XY":
-        """
-        Return an XY object with rounded values
+        """Return an XY object with rounded values.
 
-        return: XY object with rounded x and y values
+        Returns:
+            XY: XY object with rounded x and y values.
         """
         return XY(round(self.x, n), round(self.y, n))
 
     def get_max(self) -> Union[int, float]:
-        """
-        Return the maximum of the x and y value
+        """Return the maximum of the x and y value.
 
-        return: maximum value
+        Returns:
+            Union[int, float]: Maximum value.
         """
         return max([self.x, self.y])
 
     def get_min(self) -> Union[int, float]:
-        """
-        Return the minimum of the x and y value
+        """Return the minimum of the x and y value.
 
-        return: minimum value
+        Returns:
+            Union[int, float]: minimum value.
         """
         return min([self.x, self.y])
 
     def scale_to_max_value(self, max_value: float) -> "XY":
-        """
-        Scale the x and y values to given maximum value
+        """Scale the x and y values to given maximum value.
 
-        max_value: maximum value to scale x and y values to
-        return: XY object with scaled y and y values
+        Args:
+            max_value: Maximum value to scale x and y values to.
+
+        Returns:
+            XY: XY object with scaled y and y values.
         """
         if self.x > self.y:
             x = max_value
-            y = x / self.y * self.y
+            y = x / self.x * self.y
         else:
             y = max_value
             x = y / self.y * self.x

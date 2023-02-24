@@ -2,12 +2,13 @@ appdirs>=1.4.0
 colour
 geopy
 gpxpy>=1.1.2
-pint
+pint>=0.20
 pytz
 s2sphere
 svgwrite>=1.1.9
 stravalib~=0.10
 polyline
 timezonefinder
-py-staticmaps>=0.4
+# py-staticmaps>=0.4
+git+https://github.com/lowtower/py-staticmaps.git@v0.4.2#egg=py-staticmaps
 PILLOW

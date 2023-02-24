@@ -36,9 +36,10 @@ usage: create_poster [-h] [--gpx-dir DIR] [--output FILE]
                      [--heatmap-center LAT,LNG] [--heatmap-radius RADIUS_KM]
                      [--heatmap-line-transparency-width TRANSP_1,WIDTH_1, TRANSP_2,WIDTH_2, TRANSP_3,WIDTH_3]
                      [--heatmap-tile-provider TILE_PROVIDER]
-                     [--heatmap-tile-max-size PIXEL] [--circular-rings]
+                     [--heatmap-tile-max-size PIXEL]
+                     [--heatmap-tile-renderer RENDERER] [--circular-rings]
                      [--circular-ring-color COLOR]
-                     [--circular-ring-max-distance DISTANCE KM]
+                     [--circular-ring-max-distance DISTANCE]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -103,19 +104,27 @@ Heatmap Type Options:
                         calculation (default: 0.1,5.0, 0.2,2.0, 1.0,0.3).
   --heatmap-tile-provider TILE_PROVIDER
                         Optionally, choose a tile provider from the list for a
-                        background map image.
+                        background map image: osm, stamen-terrain, stamen-
+                        toner, stamen-toner-lite, arcgis-worldimagery, carto,
+                        carto-nolabels, carto-dark, carto-darknolabels,
+                        stadia-alidade-smooth, jawg-light, jawg-dark, none.
+                        (Default: None)
   --heatmap-tile-max-size PIXEL
                         Set the maximum background image size (which is
                         afterwards scaled to the poster size). This setting
                         defines how much details will be shown on the map. Be
                         sure to choose a reasonable value! (default: 1200 px)
+  --heatmap-tile-renderer RENDERER
+                        Choose a renderer for generating the background image,
+                        one of pillow, cairo. (default: pillow)
 
 Circular Type Options:
   --circular-rings      Draw distance rings.
   --circular-ring-color COLOR
                         Color of distance rings.
-  --circular-ring-max-distance DISTANCE KM
-                        Maximum distance for scaling the track length.
+  --circular-ring-max-distance DISTANCE
+                        Maximum distance for scaling the track lengths (in
+                        given units).
 ```
 
 Example:
@@ -182,31 +191,31 @@ The *Grid Poster* layouts all tracks in a grid, starting with the earliest track
 *Special tracks* are drawn with the selected *special color*.
 *Special distance tracks* are drawn with the selected *special color*.
 
-![Example Grid Poster](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_grid.png)
+![Example Grid Poster](https://raw.githubusercontent.com/flopp/GpxTrackPoster/main/examples/example_grid.png)
 [svg](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_grid.svg)
 
 ### Calendar Poster (`--type calendar`)
 The *Calendar Poster* draws one square for each day, each row of squares corresponds to specific month. If a track was recorded of a day the corresponding square is colored with the *track color* or with the *special color* if the track is marked as special. A day's total track length in kilometers is printed below each square.
 
-![Example Calendar Poster](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_calendar.png)
+![Example Calendar Poster](https://raw.githubusercontent.com/flopp/GpxTrackPoster/main/examples/example_calendar.png)
 [svg](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_calendar.svg)
 
 ### Circular Poster (`--type circular`)
 The *Circular Poster* the year in a circle; each day corresponds to a circle segment. The length of each segment corresponds to the total track distance of that day.
 
-![Example Circular Poster](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_circular.png)
+![Example Circular Poster](https://raw.githubusercontent.com/flopp/GpxTrackPoster/main/examples/example_circular.png)
 [svg](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_circular.svg)
 
 ### Heatmap Poster (`--type heatmap`)
 The *Heatmap Poster* displays all tracks within one "map". The more often a location has been "visited" on a track, the more colorful the corresponding location is on the map. *Special tracks* are drawn with the *special color*.
 
-![Example Heatmap Poster](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_heatmap.png)
+![Example Heatmap Poster](https://raw.githubusercontent.com/flopp/GpxTrackPoster/main/examples/example_heatmap.png)
 [svg](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_heatmap.svg)
 
 ### Github Poster (`--type github`)
 The *Github Poster* displays all tracks like github profile. *Special distance* are drawn with the *special color*.
 
-![Example Github Poster](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_github.png)
+![Example Github Poster](https://raw.githubusercontent.com/flopp/GpxTrackPoster/main/examples/example_github.png)
 [svg](https://github.com/flopp/GpxTrackPoster/blob/master/examples/example_github.svg)
 
 
@@ -259,6 +268,6 @@ E.g. use [Poedit](https://poedit.net/) or [Localise Online Editor](https://local
 `msgfmt gpxposter.po -o gpxposter.mo`
 
 ## License
-[MIT](https://github.com/flopp/GpxTrackPoster/blob/master/LICENSE) &copy; 2016-2021 Florian Pigorsch
+[MIT](https://github.com/flopp/GpxTrackPoster/blob/master/LICENSE) &copy; 2016-2023 Florian Pigorsch
 
 [strava-activity-type]: https://developers.strava.com/docs/reference/#api-models-ActivityType

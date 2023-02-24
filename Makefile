@@ -3,7 +3,7 @@ COPYRIGHT_FILES = README.md LICENSE gpxtrackposter/*.py tests/*.py scripts/*.py
 .PHONY: setup
 setup:
 	python3 -m venv .env
-	.env/bin/pip install --upgrade pip
+	.env/bin/pip install --upgrade pip wheel setuptools
 	.env/bin/pip install --upgrade -r requirements.txt
 	.env/bin/pip install --upgrade -r requirements-dev.txt
 	.env/bin/pip install .
@@ -18,27 +18,27 @@ bump-year:
 
 .PHONY: update-readme
 update-readme:
-	PYTHON_PATH=. .env/bin/python gpxtrackposter/cli.py --help | .env/bin/python scripts/update_readme.py README.md
+	PYTHON_PATH=. .env/bin/create_poster --help | .env/bin/python scripts/update_readme.py README.md
 
 .PHONY: format
 format:
 	.env/bin/black \
 	    --line-length 120 \
-		gpxtrackposter tests scripts
+		gpxtrackposter tests scripts setup.py
 
 .PHONY: lint
 lint:
 	.env/bin/pylint \
-	    gpxtrackposter tests scripts
+	    gpxtrackposter tests scripts setup.py
 	.env/bin/mypy \
-	    gpxtrackposter tests scripts
+	    gpxtrackposter tests scripts setup.py
 	.env/bin/codespell  \
-	    README.md gpxtrackposter/*.py tests/*.py scripts/*.py
+	    README.md gpxtrackposter/*.py tests/*.py scripts/*.py  setup.py
 	.env/bin/black \
 	    --line-length 120 \
 	    --check \
 	    --diff \
-	    gpxtrackposter tests scripts
+	    gpxtrackposter tests scripts setup.py
 
 .PHONY: test
 test:
