@@ -17,6 +17,7 @@ help: ## Print help for each target
 		| sort | awk 'BEGIN {FS=":.* ## "}; {printf "%-25s %s\n", $$1, $$2};'
 
 clean: ## Cleanup
+	@rm -rf ./.env
 	@rm -f  ./*.pyc
 	@rm -rf ./__pycache__
 	@rm -f  $(SRC_CORE)/*.pyc
