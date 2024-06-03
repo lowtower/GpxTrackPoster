@@ -1,4 +1,5 @@
 """Represent a range of years, with ability to update based on a track"""
+
 # Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -123,5 +124,4 @@ class YearRange:
             return
 
         assert self.to_year is not None
-        for year in range(self.from_year, self.to_year + 1):
-            yield year
+        yield from range(self.from_year, self.to_year + 1)
