@@ -1,6 +1,6 @@
 """Handle parsing of GPX files and writing/loading of cached data"""
 
-# Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
+# Copyright 2016-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
@@ -240,7 +240,7 @@ class TrackLoader:
             if last_end_time is None:
                 merged_tracks.append(t)
             else:
-                dt = (t.start_time() - last_end_time).total_seconds()
+                dt = int((t.start_time() - last_end_time).total_seconds())
                 if 0 < dt < 3600:
                     merged_tracks[-1].append(t)
                 else:
