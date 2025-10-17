@@ -32,7 +32,7 @@ test = [
     "autopep8",
     "black",
     "codespell",
-    "flake8",
+    "ruff",
     "isort",
     "mypy",
     "pycodestyle",
@@ -129,10 +129,121 @@ known_third_party = [
     "matplotlib", "scipy", "gnspy"
 ]
 
-[tool.flake8]
-exclude = [".git", "__pycache__", "docs", "old", "build", "dist"]
-max-complexity = 30
-max-line-length = 120
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".env",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pycache__",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "docs",
+]
+# Same as Black.
+line-length = 120
+indent-width = 4
+
+# Assume Python 3.9
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    "ALL",
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    "A",
+    "C",
+    "D",
+    "G",
+    "N",
+    "Q",
+    "S",
+    "T",
+    # pycodestyle warning
+    "W",
+]
+ignore = [
+#    "C901",
+#    "D202",
+    "D203",
+    "D211",
+    "D213",
+#    "D400",
+#    "D401",
+#    "D415",
+#    "S101",
+#    "S603",
+#    "S607",
+#    "T201",
+    "COM812",
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
 
 [tool.mypy]
 check_untyped_defs = true

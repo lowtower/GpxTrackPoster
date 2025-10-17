@@ -5,12 +5,12 @@
 autopep8
 black
 codespell
-flake8
 isort
 mypy
 pycodestyle
 pyflakes
 pylint
+ruff
 
 # Testing
 coverage

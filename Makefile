@@ -66,6 +66,8 @@ format: ## Format the code
 	.env/bin/black \
 		--line-length 120 \
 		$(SRC_COMPLETE)
+	.env/bin/$(PYTHON) -m ruff format \
+		$(SRC_COMPLETE)
 
 .PHONY: lint
 lint: ## Lint the code
@@ -82,9 +84,9 @@ lint: ## Lint the code
 	    $(SRC_COMPLETE)
 	.env/bin/pyflakes \
 		$(SRC_COMPLETE)
-	.env/bin/flake8 \
-		$(SRC_COMPLETE)
 	.env/bin/pylint \
+		$(SRC_COMPLETE)
+	.env/bin/$(PYTHON) -m ruff check \
 		$(SRC_COMPLETE)
 	.env/bin/mypy \
 		$(SRC_COMPLETE)
