@@ -124,5 +124,4 @@ class YearRange:
             return
 
         assert self.to_year is not None
-        for year in range(self.from_year, self.to_year + 1):
-            yield year
+        yield from range(self.from_year, self.to_year + 1)

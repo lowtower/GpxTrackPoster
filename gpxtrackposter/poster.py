@@ -77,6 +77,7 @@ class Poster:
         self.special_distance: Dict[str, float] = {"special_distance1": 10, "special_distance2": 20}
         self.width: int = 200
         self.height: int = 300
+        self.padding: Dict[str, int] = {"l": 10, "t": 30, "r": 10, "b": 30}
         self.years: YearRange = YearRange()
         self.tracks_drawer: Optional["TracksDrawer"] = None
         self._trans: Optional[Callable[[str], str]] = None
@@ -221,9 +222,14 @@ class Poster:
         d = svgwrite.Drawing(output, (f"{self.width}mm", f"{self.height}mm"))
         d.viewbox(width=self.width, height=self.height)
         d.add(d.rect((0, 0), (self.width, self.height), fill=self.colors["background"]))
+        self._draw_background(d, XY(self.width, self.height), XY(0.0, 0.0))
         self._draw_header(d)
         self._draw_footer(d)
-        self._draw_tracks(d, XY(self.width - 20, self.height - 30 - 30), XY(10, 30))
+        self._draw_tracks(
+            d,
+            XY(self.width - self.padding["l"] - self.padding["r"], self.height - self.padding["t"] - self.padding["b"]),
+            XY(self.padding["l"], self.padding["t"]),
+        )
         d.save()
 
     def m2u(self, m: pint.Quantity) -> float:
@@ -267,6 +273,14 @@ class Poster:
         d.add(g)
 
         self.tracks_drawer.draw(d, g, size, offset)
+
+    def _draw_background(self, d: svgwrite.Drawing, size: XY, offset: XY) -> None:
+        assert self.tracks_drawer
+
+        g = d.g(id="background")
+        d.add(g)
+
+        self.tracks_drawer.draw_background(d, g, size, offset)
 
     def _draw_header(self, d: svgwrite.Drawing) -> None:
         g = d.g(id="header")

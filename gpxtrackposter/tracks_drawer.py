@@ -37,6 +37,17 @@ class TracksDrawer:
 
         """
 
+    def draw_background(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
+        """Draw background for all poster types - rectangle with 'background' color
+
+        Args:
+            dr: svg drawing
+            g: svg group
+            size: Size
+            offset: Offset
+        """
+        g.add(dr.rect((offset.x, offset.y), (size.x, size.y), fill=self.poster.colors["background"]))
+
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
         """Draw the circular Poster using distances broken down by time.
 
