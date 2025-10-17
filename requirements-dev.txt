@@ -32,3 +32,4 @@ Pygments
 python-dateutil
 types-python-dateutil
 types-pytz
+types-setuptools

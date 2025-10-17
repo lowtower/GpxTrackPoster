@@ -19,18 +19,19 @@ if not readme_md_file_name.endswith("README.md"):
 with open(readme_md_file_name, "r", encoding="utf8") as f:
     lines = f.readlines()
 
+# TODO: remove invalid-name if python3.9 is dropped
 with open(readme_md_file_name, "w", encoding="utf8") as f:
-    STATE = 0
+    state = 0  # pylint: disable=invalid-name
     for line in lines:
-        if STATE == 0:
+        if state == 0:  # pylint: disable=invalid-name
             if line.startswith("usage: create_poster"):
                 f.write(usage)
-                STATE = 1
+                state = 1  # pylint: disable=invalid-name
             else:
                 f.write(line)
-        elif STATE == 1:
+        elif state == 1:  # pylint: disable=invalid-name
             if line.startswith("```"):
                 f.write(line)
-                STATE = 2
+                state = 2  # pylint: disable=invalid-name
         else:
             f.write(line)
