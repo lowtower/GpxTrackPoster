@@ -82,8 +82,7 @@ class HeatmapDrawer(TracksDrawer):
             dest="heatmap_radius",
             metavar="RADIUS_KM",
             type=float,
-            help="Scale the heatmap such that at least a circle with radius=RADIUS_KM is visible "
-            "(default: automatic).",
+            help="Scale the heatmap such that at least a circle with radius=RADIUS_KM is visible (default: automatic).",
         )
         group.add_argument(
             "--heatmap-line-transparency-width",

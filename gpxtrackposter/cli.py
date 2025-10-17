@@ -148,7 +148,7 @@ def create_parser() -> argparse.ArgumentParser:
         metavar="FILE",
         action="append",
         default=[],
-        help="Mark track file from the GPX directory as special; use multiple times to mark " "multiple tracks.",
+        help="Mark track file from the GPX directory as special; use multiple times to mark multiple tracks.",
     )
     types = '", "'.join(drawers.keys())
     args_parser.add_argument(

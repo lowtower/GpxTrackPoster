@@ -12,6 +12,7 @@ version = "0.1"
 description = "Setup GpxTrackPoster"
 readme = "README.md"
 license = { file = "LICENSE" }
+# Assume Python version >= 3.9
 requires-python = ">=3.9"
 dependencies = [
     "appdirs>=1.4.0",
@@ -92,42 +93,12 @@ packages = ["gpxtrackposter"]
     "examples/extend_parser.py"
 ]
 
-[tool.pytest.ini_options]
-addopts = "-v -ra -s"
-pythonpath = ["src"]
-testpaths = ["tests"]
-markers = [
-    "full_run: marks tests as full run (deselect with '-m \"not full_run\"')",
-    "debug: debugging tests"
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:"
-]
-
-[tool.coverage.paths]
-source = ["./gpxtrackposter/*"]
-
-[tool.coverage.html]
-directory = "reports"
-
-[tool.coverage.run]
-branch = true
-parallel = true
-omit = ["gpxtrackposter/__init__.py"]
-
-[tool.isort]
-profile = "black"
-known_third_party = [
-    "numpy", "pandas", "keras", "tensorflow", "sklearn",
-    "matplotlib", "scipy", "gnspy"
-]
+[tool.black]
+line-length = 120
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+target_version = ['py39']
+include = '\.py?$'
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
@@ -166,7 +137,7 @@ exclude = [
 line-length = 120
 indent-width = 4
 
-# Assume Python 3.9
+# Always generate Python 3.9-compatible code.
 target-version = "py39"
 
 [tool.ruff.lint]
@@ -197,14 +168,15 @@ select = [
 ]
 ignore = [
 #    "C901",
+    "D105",  # to be removed
 #    "D202",
     "D203",
     "D211",
     "D213",
-#    "D400",
-#    "D401",
-#    "D415",
-#    "S101",
+    "D400",
+    "D401",
+    "D415",
+    "S101",
 #    "S603",
 #    "S607",
 #    "T201",
@@ -280,6 +252,58 @@ max-module-lines = 2000
 skip = "*.po,*.ts"
 count = ""
 quiet-level = 3
+
+[tool.pytest.ini_options]
+addopts = "-v -ra -s"
+pythonpath = ["./gpxtrackposter"]
+testpaths = ["./tests"]
+markers = [
+    "full_run: marks tests as full run (deselect with '-m \"not full_run\"')",
+    "debug: debugging tests"
+]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    "pragma: no cover",
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+    "if DEBUG_MODE",
+
+    # Don't complain if tests don't hit defensive assertion code:
+#    "raise AssertionError",
+#    "raise NotImplementedError",
+
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc\\.)?abstractmethod",
+    ]
+fail_under = 80
+ignore_errors = true
+
+[tool.coverage.paths]
+source = ["./gpxtrackposter/*"]
+
+[tool.coverage.html]
+directory = "reports"
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = ["gpxtrackposter/__init__.py"]
+
+[tool.isort]
+profile = "black"
+known_third_party = [
+    "numpy", "pandas", "keras", "tensorflow", "sklearn",
+    "matplotlib", "scipy", "gnspy"
+]
+
+
 
 [tool.mkdocs]
 site_name = "gpxtrackposter"
