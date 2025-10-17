@@ -59,37 +59,37 @@ update-readme: ## update readme to output of 'gpxtrackposter --help'
 .PHONY: format
 format: ## Format the code
 	.env/bin/isort \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/autopep8 \
 		-i -r \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/black \
 		--line-length 120 \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 
 .PHONY: lint
 lint: ## Lint the code
 	.env/bin/pycodestyle \
 	--max-line-length=120 \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/isort \
-		setup.py $(SRC_COMPLETE) \
+		$(SRC_COMPLETE) \
 		--check --diff
 	.env/bin/black \
 	    --line-length 120 \
 	    --check \
 	    --diff \
-	    setup.py $(SRC_COMPLETE)
+	    $(SRC_COMPLETE)
 	.env/bin/pyflakes \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/flake8 \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/pylint \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/mypy \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/codespell \
-	    README.md setup.py gpxtrackposter/*.py tests/*.py scripts/*.py
+	    README.md gpxtrackposter/*.py tests/*.py scripts/*.py
 
 .PHONY: test
 test: ## Test the code

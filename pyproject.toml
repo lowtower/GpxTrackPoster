@@ -1,0 +1,229 @@
+
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gpxtrackposter"
+version = "0.1"
+description = "Setup GpxTrackPoster"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+dependencies = [
+    "appdirs>=1.4.0",
+    "colour",
+    "geopy",
+    "gpxpy>=1.1.2",
+    "pint>=0.20",
+    "pytz",
+    "s2sphere",
+    "svgwrite>=1.1.9",
+    "stravalib~=0.10",
+    "polyline",
+    "timezonefinder"
+]
+
+[project.optional-dependencies]
+test = [
+    "autopep8",
+    "black",
+    "codespell",
+    "flake8",
+    "isort",
+    "mypy",
+    "pycodestyle",
+    "pyflakes",
+    "pylint",
+    "coverage",
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "mkdocs",
+    "mkdocstrings",
+    "mkdocstrings-python",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mkdocs-material",
+    "mkdocs-section-index",
+    "Pygments",
+    "python-dateutil",
+    "types-python-dateutil",
+    "types-pytz",
+    "types-setuptools"
+]
+
+[project.scripts]
+create_poster = "gpxtrackposter.cli:main"
+
+[tool.setuptools]
+packages = ["gpxtrackposter"]
+
+[tool.setuptools.data-files]
+"." = ["requirements.txt", "requirements-dev.txt"]
+"share/locale/de_DE/LC_MESSAGES" = ["locale/de_DE/LC_MESSAGES/gpxposter.mo"]
+"share/locale/fi_FI/LC_MESSAGES" = ["locale/fi_FI/LC_MESSAGES/gpxposter.mo"]
+"share/locale/fr_FR/LC_MESSAGES" = ["locale/fr_FR/LC_MESSAGES/gpxposter.mo"]
+"share/locale/ru_RU/LC_MESSAGES" = ["locale/ru_RU/LC_MESSAGES/gpxposter.mo"]
+"share/locale/zh_CN/LC_MESSAGES" = ["locale/zh_CN/LC_MESSAGES/gpxposter.mo"]
+"share/locale/ar/LC_MESSAGES" = ["locale/ar/LC_MESSAGES/hatta.mo"]
+"share/locale/cs/LC_MESSAGES" = ["locale/cs/LC_MESSAGES/hatta.mo"]
+"share/locale/da/LC_MESSAGES" = ["locale/da/LC_MESSAGES/hatta.mo"]
+"share/locale/de/LC_MESSAGES" = ["locale/de/LC_MESSAGES/hatta.mo"]
+"share/locale/el/LC_MESSAGES" = ["locale/el/LC_MESSAGES/hatta.mo"]
+"share/locale/es/LC_MESSAGES" = ["locale/es/LC_MESSAGES/hatta.mo"]
+"share/locale/et/LC_MESSAGES" = ["locale/et/LC_MESSAGES/hatta.mo"]
+"share/locale/fi/LC_MESSAGES" = ["locale/fi/LC_MESSAGES/hatta.mo"]
+"share/locale/fr/LC_MESSAGES" = ["locale/fr/LC_MESSAGES/hatta.mo"]
+"share/locale/hu/LC_MESSAGES" = ["locale/hu/LC_MESSAGES/hatta.mo"]
+"share/locale/ja/LC_MESSAGES" = ["locale/ja/LC_MESSAGES/hatta.mo"]
+"share/locale/lt/LC_MESSAGES" = ["locale/lt/LC_MESSAGES/hatta.mo"]
+"share/locale/pl/LC_MESSAGES" = ["locale/pl/LC_MESSAGES/hatta.mo"]
+"share/locale/ru/LC_MESSAGES" = ["locale/ru/LC_MESSAGES/hatta.mo"]
+"share/locale/sv/LC_MESSAGES" = ["locale/sv/LC_MESSAGES/hatta.mo"]
+"share/locale/vi/LC_MESSAGES" = ["locale/vi/LC_MESSAGES/hatta.mo"]
+"share/doc/hatta/examples" = [
+    "examples/hatta.fcgi",
+    "examples/hatta.gzip.fcgi",
+    "examples/hatta.wsgi",
+    "examples/extend_parser.py"
+]
+
+[tool.pytest.ini_options]
+addopts = "-v -ra -s"
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = [
+    "full_run: marks tests as full run (deselect with '-m \"not full_run\"')",
+    "debug: debugging tests"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:"
+]
+
+[tool.coverage.paths]
+source = ["./gpxtrackposter/*"]
+
+[tool.coverage.html]
+directory = "reports"
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = ["gpxtrackposter/__init__.py"]
+
+[tool.isort]
+profile = "black"
+known_third_party = [
+    "numpy", "pandas", "keras", "tensorflow", "sklearn",
+    "matplotlib", "scipy", "gnspy"
+]
+
+[tool.flake8]
+exclude = [".git", "__pycache__", "docs", "old", "build", "dist"]
+max-complexity = 30
+max-line-length = 120
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+warn_unused_configs = true
+warn_no_return = true
+warn_unreachable = false
+
+[tool.pycodestyle]
+count = false
+statistics = true
+
+[tool.pylint.config]
+extension-pkg-whitelist = [
+    "numpy", "pandas", "keras", "tensorflow", "sklearn",
+    "matplotlib", "scipy"
+]
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "missing-docstring",
+    "too-many-positional-arguments",
+    "use-yield-from"
+]
+jobs = 1
+confidence = "HIGH"
+
+[tool.pylint.FORMAT]
+max-line-length = 120
+max-module-lines = 2000
+
+[tool.codespell]
+skip = "*.po,*.ts"
+count = ""
+quiet-level = 3
+
+[tool.mkdocs]
+site_name = "gpxtrackposter"
+site_description = "Create a visually appealing poster from your GPX tracks"
+repo_url = "https://github.com/lowtower/gpxtrackposter"
+repo_name = "gpxtrackposter"
+use_directory_urls = false
+
+[tool.mkdocs.theme]
+name = "material"
+icon.repo = "fontawesome/brands/github"
+
+[[tool.mkdocs.theme.palette]]
+media = "(prefers-color-scheme: light)"
+primary = "blue"
+accent = "grey"
+scheme = "default"
+toggle.icon = "material/toggle-switch-off-outline"
+toggle.name = "Switch to dark mode"
+
+[[tool.mkdocs.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+primary = "blue"
+accent = "white"
+scheme = "slate"
+toggle.icon = "material/toggle-switch"
+toggle.name = "Switch to light mode"
+
+[tool.mkdocs.plugins]
+search = {}
+autorefs = {}
+section-index = {}
+
+[tool.mkdocs.plugins.gen-files]
+scripts = ["docs/gen_ref_pages.py"]
+
+[tool.mkdocs.plugins.literate-nav]
+nav_file = "SUMMARY.md"
+
+[tool.mkdocs.plugins.mkdocstrings]
+default_handler = "python"
+
+[tool.mkdocs.plugins.mkdocstrings.handlers.python]
+paths = ["gpxtrackposter"]
+
+[tool.mkdocs.plugins.mkdocstrings.options]
+show_root_heading = true
+show_source = true
+
+[tool.mkdocs.plugins.mkdocstrings.watch]
+paths = ["gpxtrackposter"]
+
+[tool.mkdocs.markdown_extensions]
+extensions = [
+    "pymdownx.highlight",
+    "pymdownx.magiclink",
+    "pymdownx.superfences"
+]
