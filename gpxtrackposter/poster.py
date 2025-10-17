@@ -1,6 +1,6 @@
 """Create a poster from track data."""
 
-# Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
+# Copyright 2016-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
@@ -398,7 +398,7 @@ class Poster:
         weeks = {}
         for t in self.tracks:
             total_length += t.length()
-            self.total_length_year_dict[t.start_time().year] += t.length()
+            self.total_length_year_dict[t.start_time().year] += t.length()  # type: ignore
             length_range.extend(t.length())
             # time.isocalendar()[1] -> week number
             weeks[(t.start_time().year, t.start_time().isocalendar()[1])] = 1
