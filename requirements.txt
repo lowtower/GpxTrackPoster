@@ -1,11 +1,11 @@
-appdirs>=1.4.0
+appdirs
 colour
 geopy
-gpxpy>=1.1.2
-pint>=0.20
+gpxpy
+pint
 pytz
 s2sphere
-svgwrite>=1.1.9
-stravalib~=0.10
+svgwrite
+stravalib
 polyline
-timezonefinder 
+timezonefinder
