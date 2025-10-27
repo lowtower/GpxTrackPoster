@@ -14,7 +14,7 @@ import gpxpy  # type: ignore
 import pint  # type: ignore
 import polyline  # type: ignore
 import s2sphere  # type: ignore
-from stravalib.model import Activity as StravaActivity  # type: ignore
+from stravalib.model import DetailedActivity as StravaActivity  # type: ignore
 
 from gpxtrackposter.exceptions import TrackLoadError
 from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
