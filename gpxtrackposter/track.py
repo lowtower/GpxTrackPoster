@@ -5,6 +5,8 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from __future__ import annotations
+
 import datetime
 import json
 import os
@@ -88,8 +90,10 @@ class Track:
         """
         # use strava as file name
         self.file_names = [str(activity.id)]
+        if not activity.start_date_local or not activity.distance or not activity.map or not activity.elapsed_time:
+            raise ValueError("Strava activity is not valid!")
         self.set_start_time(activity.start_date_local)
-        self.set_end_time(activity.start_date_local + activity.elapsed_time)
+        self.set_end_time(activity.start_date_local + activity.elapsed_time.timedelta())
         self._length_meters = float(activity.distance)
         summary_polyline = activity.map.summary_polyline
         polyline_data = polyline.decode(summary_polyline) if summary_polyline else []
@@ -112,7 +116,7 @@ class Track:
         assert self._start_time is not None
         return self._start_time
 
-    def set_start_time(self, value: datetime.datetime) -> None:
+    def set_start_time(self, value: datetime.datetime | None) -> None:
         """Set the start time to the given value.
 
         Args:
