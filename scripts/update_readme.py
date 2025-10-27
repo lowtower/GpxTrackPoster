@@ -11,13 +11,13 @@ import sys
 
 usage = sys.stdin.read()
 if not usage.startswith("usage: create_poster"):
-    MSG = "Bad usage info from stdin"
-    raise RuntimeError(MSG)
+    msg = "Bad usage info from stdin"
+    raise RuntimeError(msg)
 
 readme_md_file_name = sys.argv[1]
 if not readme_md_file_name.endswith("README.md"):
-    MSG = f"Bad README.md file: {readme_md_file_name}"
-    raise RuntimeError(MSG)
+    msg = f"Bad README.md file: {readme_md_file_name}"
+    raise RuntimeError(msg)
 
 # replace usage in README.md
 with open(readme_md_file_name, encoding="utf8") as f:
