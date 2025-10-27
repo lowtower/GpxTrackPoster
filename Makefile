@@ -85,7 +85,7 @@ lint: ## Lint the code
 		$(SRC_COMPLETE)
 	.env/bin/pylint \
 		$(SRC_COMPLETE)
-	.env/bin/$(PYTHON) -m ruff check \
+	.env/bin/python -m ruff check \
 		$(SRC_COMPLETE)
 	.env/bin/mypy \
 		$(SRC_COMPLETE)
