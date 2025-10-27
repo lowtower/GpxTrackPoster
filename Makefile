@@ -5,7 +5,6 @@ SRC_TEST = tests
 SRC_COMPLETE = $(SRC_CORE) $(SRC_TEST) $(SRC_SCRIPTS) docs/gen_ref_pages.py
 COPYRIGHT_FILES = $(SRC_CORE) $(SRC_TEST) $(SRC_SCRIPTS) README.md LICENSE
 PYTHON=python3
-PIP=$(PYTHON) -m pip
 
 help: ## Print help for each target
 	$(info Makefile low-level Python API.)
@@ -60,10 +59,10 @@ update-readme: ## update readme to output of 'gpxtrackposter --help'
 format: ## Format the code
 	.env/bin/isort \
 		$(SRC_COMPLETE)
-	.env/bin/autopep8 \
+#	.env/bin/autopep8 \
 		-i -r \
 		$(SRC_COMPLETE)
-	.env/bin/black \
+#	.env/bin/black \
 		--line-length 120 \
 		$(SRC_COMPLETE)
 	.env/bin/$(PYTHON) -m ruff format \
@@ -77,7 +76,7 @@ lint: ## Lint the code
 	.env/bin/isort \
 		$(SRC_COMPLETE) \
 		--check --diff
-	.env/bin/black \
+#	.env/bin/black \
 	    --line-length 120 \
 	    --check \
 	    --diff \
@@ -125,4 +124,4 @@ compile-messages: ## compile messages
 .PHONY: documentation
 documentation: ## Generate documentation
 	@if type mkdocs >/dev/null 2>&1 ; then .env/bin/python -m mkdocs build --clean --verbose ; \
-	 else echo "SKIPPED. Run '$(PIP) install mkdocs' first." >&2 ; fi 
+	 else echo "SKIPPED. Run '.env/bin/python -m pip install mkdocs' first." >&2 ; fi 

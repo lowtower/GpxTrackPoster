@@ -9,8 +9,8 @@ import calendar
 import datetime
 import locale
 
-import pint  # type: ignore
-import svgwrite  # type: ignore
+import pint  # type: ignore[attr-defined]
+import svgwrite  # type: ignore[attr-defined]
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError
@@ -24,9 +24,11 @@ class GithubDrawer(TracksDrawer):
 
     Methods:
         draw: Iterate through the Poster's years, creating a calendar for each.
+
     """
 
-    def __init__(self, the_poster: Poster):
+    def __init__(self, the_poster: Poster) -> None:
+        """Initialize the GithubDrawer class."""
         super().__init__(the_poster)
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
@@ -37,9 +39,12 @@ class GithubDrawer(TracksDrawer):
             g: svg group
             size: Size
             offset: Offset
+
         """
+        _ = size
         if len(self.poster.tracks) == 0:
-            raise PosterError("No tracks to draw.")
+            msg = "No tracks to draw."
+            raise PosterError(msg)
         year_size = 200 * 4.0 / 80.0
         year_style = f"font-size:{year_size}px; font-family:Arial;"
         year_length_style = f"font-size:{110 * 3.0 / 80.0}px; font-family:Arial;"

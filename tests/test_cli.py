@@ -1,6 +1,4 @@
-"""
-Several tests for entry point cli.py
-"""
+"""Several tests for entry point cli.py"""
 
 # Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
@@ -29,6 +27,7 @@ from gpxtrackposter.units import Units
 
 
 def test_create_parser_without_args_sets_default_values(default_values: argparse.Namespace) -> None:
+    """Test create parser without arguments sets default values"""
     parser = create_parser()
     parsed = parse_args(parser, [])
     for value in vars(default_values):
@@ -44,14 +43,14 @@ def test_setup_logging_returns_instance_of_logger() -> None:
     logger = setup_logging()
     assert logger
     assert isinstance(logger, logging.Logger)
-    assert logging.ERROR == logger.getEffectiveLevel()
+    assert logger.getEffectiveLevel() == logging.ERROR
 
 
 def test_setup_logging_verbose_sets_logger_level_info() -> None:
     """Test setup of logging"""
     logger = setup_logging(verbose=True)
     assert logger
-    assert logging.INFO == logger.getEffectiveLevel()
+    assert logger.getEffectiveLevel() == logging.INFO
 
 
 def test_setup_logging_logfile_sets_file_handler() -> None:

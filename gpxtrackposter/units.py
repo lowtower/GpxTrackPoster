@@ -5,9 +5,9 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import typing
+from __future__ import annotations
 
-import pint  # type: ignore
+import pint
 
 
 class Units:
@@ -16,8 +16,10 @@ class Units:
     _instance = None
 
     def __init__(self) -> None:
+        """Initialize the Units class."""
         if not Units._instance:
             Units._instance = pint.UnitRegistry()
 
-    def __getattr__(self, name: str) -> typing.Any:
+    def __getattr__(self, name: str) -> pint.Unit:
+        """Get a unit."""
         return getattr(Units._instance, name)

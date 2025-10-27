@@ -1,6 +1,4 @@
-"""
-Several tests for Localization
-"""
+"""Several tests for Localization"""
 
 # Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
@@ -8,6 +6,7 @@ Several tests for Localization
 # license that can be found in the LICENSE file.
 
 import locale
+import logging
 
 import pytest
 
@@ -18,10 +17,11 @@ from gpxtrackposter.localization import localized_day_of_week_name
     "invalid_day",
     [-10, -1, 7, 10],
 )
-def test_localized_with_invalid_raises_exception(invalid_day: int) -> None:
+def test_localized_with_invalid_value_raises_exception(invalid_day: int) -> None:
     """method with invalid value returns False"""
     with pytest.raises(AssertionError):
         assert not localized_day_of_week_name(invalid_day, True)
+    with pytest.raises(AssertionError):
         assert not localized_day_of_week_name(invalid_day, False)
 
 
@@ -52,6 +52,7 @@ def test_localized_returns_expected_value(
     language: str, locale_lang: str, weekday_num: int, short: bool, expected: str
 ) -> None:
     """method with valid values returns expected value"""
-    print(language)
+    log = logging.getLogger("gpxtrackposter")
+    log.info(language)
     locale.setlocale(category=locale.LC_ALL, locale=[locale_lang, "UTF-8"])
     assert expected == localized_day_of_week_name(weekday_num, short)

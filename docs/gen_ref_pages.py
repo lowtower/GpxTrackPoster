@@ -10,9 +10,7 @@ SRC = "gpxtrackposter"
 
 
 def main() -> None:
-    """
-    main entry point
-    """
+    """Main entry point"""
 
     nav = mkdocs_gen_files.Nav()
 

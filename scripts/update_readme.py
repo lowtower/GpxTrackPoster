@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Update README"""
+
 # Copyright 2018-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -9,14 +11,16 @@ import sys
 
 usage = sys.stdin.read()
 if not usage.startswith("usage: create_poster"):
-    raise RuntimeError("Bad usage info from stdin")
+    MSG = "Bad usage info from stdin"
+    raise RuntimeError(MSG)
 
 readme_md_file_name = sys.argv[1]
 if not readme_md_file_name.endswith("README.md"):
-    raise RuntimeError(f"Bad README.md file: {readme_md_file_name}")
+    MSG = f"Bad README.md file: {readme_md_file_name}"
+    raise RuntimeError(MSG)
 
 # replace usage in README.md
-with open(readme_md_file_name, "r", encoding="utf8") as f:
+with open(readme_md_file_name, encoding="utf8") as f:
     lines = f.readlines()
 
 # TODO: remove invalid-name if python3.9 is dropped

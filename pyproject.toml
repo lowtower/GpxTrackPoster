@@ -1,7 +1,7 @@
 
 [build-system]
 requires = [
-    "setuptools>=61.0",
+    "setuptools",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -12,18 +12,19 @@ version = "0.1"
 description = "Setup GpxTrackPoster"
 readme = "README.md"
 license = { file = "LICENSE" }
-# Assume Python version >= 3.9
-requires-python = ">=3.9"
+# Assume Python version >= 3.10
+requires-python = ">=3.10"
 dependencies = [
-    "appdirs>=1.4.0",
+    "appdirs",
     "colour",
     "geopy",
-    "gpxpy>=1.1.2",
-    "pint>=0.20",
+    "gpxpy",
+    "pint",
+    "py-staticmaps",
     "pytz",
     "s2sphere",
-    "svgwrite>=1.1.9",
-    "stravalib~=0.10",
+    "svgwrite",
+    "stravalib",
     "polyline",
     "timezonefinder"
 ]
@@ -97,7 +98,7 @@ packages = ["gpxtrackposter"]
 line-length = 120
 skip-string-normalization = false
 skip-magic-trailing-comma = false
-target_version = ['py39']
+target_version = ['py310']
 include = '\.py?$'
 
 [tool.ruff]
@@ -137,8 +138,8 @@ exclude = [
 line-length = 120
 indent-width = 4
 
-# Always generate Python 3.9-compatible code.
-target-version = "py39"
+# Always generate Python 3.10-compatible code.
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [
@@ -167,20 +168,26 @@ select = [
     "W",
 ]
 ignore = [
-#    "C901",
-    "D105",  # to be removed
-#    "D202",
+    "C901",
+    "D202",
     "D203",
     "D211",
     "D213",
     "D400",
     "D401",
+    "D403",
     "D415",
-    "S101",
-#    "S603",
-#    "S607",
-#    "T201",
-    "COM812",
+    "PLR",  # magic-value-comparison
+    "S101",  # assert
+#    "S603",  # subprocess-without-shell-equals-true
+#    "S607",  # start-process-with-partial-path
+#    "T201",  # print
+    "COM812",  # missing-trailing-comma
+    # to be removed
+    "FBT001",  # boolean-type-hint-positional-argument
+    "FBT002",  # boolean-default-value-positional-argument
+    "PTH",  # PATHLIB
+    "DTZ",  # DATETIMEZONE
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -189,6 +196,35 @@ unfixable = []
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"gpxtrackposter/heatmap_drawer.py" = [
+    "FIX002",  # line-contains-todo
+    "PLC0415",  # import-outside-top-level
+    "TD",  # TODO
+]
+"gpxtrackposter/track.py" = [
+    "TRY301",  # raise-within-try
+]
+"gpxtrackposter/track_loader.py" = [
+    "BLE001",  # blind-except
+    "PERF203",  # try-except-in-loop
+]
+"docs/gen_ref_pages.py" = [
+    "ERA001",  # commented-out-code
+]
+"tests/**.py" = [
+    "FBT003",  # boolean-positional-value-in-call
+    "PLR0913",  # too-many-arguments
+    "PLR2004",  # magic-value-comparison
+    "PT006",  # pytest-parametrize-names-wrong-type
+    "PT011",  # pytest-raises-too-broad
+    "SLF001",  # private-member-access
+]
+"scripts/**.py" = [
+    "FIX",  # FIXME
+    "TD",  # TODO
+]
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
@@ -224,6 +260,7 @@ disallow_untyped_defs = true
 warn_unused_configs = true
 warn_no_return = true
 warn_unreachable = false
+enable_error_code = ["ignore-without-code"]
 
 [tool.pycodestyle]
 count = false

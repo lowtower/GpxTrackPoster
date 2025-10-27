@@ -12,8 +12,7 @@ import locale
 # If short is False return the full day name, otherwise return the shortest
 # possible abbreviation (e.g. the first letter)
 def localized_day_of_week_name(day_of_week: int, short: bool) -> str:
-    """
-    Return a localized name gor a given weekday
+    """Return a localized name gor a given weekday
 
     Args:
         day_of_week: integer representing the weekday (0-6)
@@ -21,6 +20,7 @@ def localized_day_of_week_name(day_of_week: int, short: bool) -> str:
 
     Returns:
         str: full or short localized name of weekday
+
     """
     assert 0 <= day_of_week <= 6
 

@@ -8,8 +8,8 @@
 import calendar
 import datetime
 
-import pint  # type: ignore
-import svgwrite  # type: ignore
+import pint  # type: ignore[attr-defined]
+import svgwrite  # type: ignore[attr-defined]
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError
@@ -24,9 +24,11 @@ class CalendarDrawer(TracksDrawer):
 
     Methods:
         draw: Iterate through the Poster's years, creating a calendar for each.
+
     """
 
-    def __init__(self, the_poster: Poster):
+    def __init__(self, the_poster: Poster) -> None:
+        """Initialize the CalendarDrawer class."""
         super().__init__(the_poster)
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
@@ -37,13 +39,16 @@ class CalendarDrawer(TracksDrawer):
             g: svg group
             size: Size
             offset: Offset
+
         """
         if len(self.poster.tracks) == 0:
-            raise PosterError("No tracks to draw.")
+            msg = "No tracks to draw."
+            raise PosterError(msg)
         years = self.poster.years.count()
         _, counts = utils.compute_grid(years, size)
         if counts is None:
-            raise PosterError("Unable to compute grid.")
+            msg = "Unable to compute grid."
+            raise PosterError(msg)
         count_x, count_y = counts[0], counts[1]
         x, y = 0, 0
         cell_size = size * XY(1 / count_x, 1 / count_y)
@@ -72,6 +77,7 @@ class CalendarDrawer(TracksDrawer):
             size: Size
             offset: Offset
             year: Year
+
         """
         min_size = min(size.x, size.y)
         year_size = min_size * 4.0 / 80.0

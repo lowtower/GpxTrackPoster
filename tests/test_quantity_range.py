@@ -1,6 +1,4 @@
-"""
-Several tests for QuantityRange
-"""
+"""Several tests for QuantityRange"""
 
 # Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
@@ -8,7 +6,7 @@ Several tests for QuantityRange
 # license that can be found in the LICENSE file.
 
 import pytest
-from pint import Quantity  # type: ignore
+from pint import Quantity  # type: ignore[attr-defined]
 
 from gpxtrackposter.quantity_range import QuantityRange
 

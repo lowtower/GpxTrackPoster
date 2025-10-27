@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Bump year"""
+
 # Copyright 2018-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -15,9 +17,10 @@ re_year_range = re.compile(r"\s(\d\d\d\d)-(\d\d\d\d) Florian Pigorsch")
 
 
 def bump_year(file_name: str) -> None:
+    """Bump year"""
     lines = []
-    with open(file_name, "r", encoding="utf8") as f:
-        for line in f.readlines():
+    with open(file_name, encoding="utf8") as f:
+        for line in f:
             m = re_year.search(line)
             if m and (m.group(1) != THIS_YEAR):
                 start, end = m.span(1)

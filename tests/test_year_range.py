@@ -1,18 +1,17 @@
-"""
-Several tests for YearRange
-"""
+"""Several tests for YearRange"""
+
+from __future__ import annotations
+
+from datetime import datetime
+
+import pytest
+
+from gpxtrackposter.year_range import YearRange
 
 # Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
-
-from datetime import datetime
-from typing import Optional
-
-import pytest
-
-from gpxtrackposter.year_range import YearRange
 
 
 def test_init_returns_invalid_instance() -> None:
@@ -27,7 +26,7 @@ def test_init_returns_invalid_instance() -> None:
     [("all", None, None), ("2016", 2016, 2016), ("2018", 2018, 2018), ("2016-2018", 2016, 2018)],
 )
 def test_parse_with_valid_strings_sets_values_returns_true(
-    string: str, from_year: Optional[int], to_year: Optional[int]
+    string: str, from_year: int | None, to_year: int | None
 ) -> None:
     """parse with valid strings returns True"""
     year_range = YearRange()
@@ -123,7 +122,7 @@ def test_contains_returns_false(string: str, value: datetime) -> None:
 def test_count_with_empty_year_range_returns_zero() -> None:
     """count with empty year range returns 0"""
     year_range = YearRange()
-    assert 0 == year_range.count()
+    assert year_range.count() == 0
 
 
 @pytest.mark.parametrize(
@@ -144,9 +143,7 @@ def test_count_returns_value(string: str, expected_value: int) -> None:
 def test_iter_with_empty_year_range_returns() -> None:
     """iter with empty year range returns"""
     year_range = YearRange()
-    list_of_years = []
-    for year in year_range.iter():
-        list_of_years.append(year)
+    list_of_years = list(year_range.iter())
     assert not list_of_years
 
 
@@ -162,7 +159,5 @@ def test_iter_returns_values(string: str, expected_values: list) -> None:
     """iter returns YearRange values"""
     year_range = YearRange()
     assert year_range.parse(string)
-    list_of_years = []
-    for year in year_range.iter():
-        list_of_years.append(year)
+    list_of_years = list(year_range.iter())
     assert expected_values == list_of_years

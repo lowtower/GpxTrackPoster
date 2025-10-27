@@ -1,19 +1,19 @@
 #!/usr/bin/env python
-"""
-Entry point - cli.py
-"""
+"""Entry point - cli.py"""
+
 # Copyright 2016-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from __future__ import annotations
+
 import argparse
 import logging
 import os
 import sys
-from typing import List, Optional
 
-import appdirs  # type: ignore
+import appdirs  # type: ignore[attr-defined]
 
 from gpxtrackposter import (
     calendar_drawer,
@@ -42,19 +42,18 @@ drawers = {
 
 def main() -> None:
     """Handle command line arguments and call other modules as needed."""
-
     # create basic args parser
     args_parser = create_parser()
 
     # add command line options for every single drawer type
-    for _, drawer in drawers.items():
+    for drawer in drawers.values():
         drawer.create_args(args_parser)
 
     # parse all arguments
     args = parse_args(args_parser, sys.argv[1:])
 
     # fetch all arguments
-    for _, drawer in drawers.items():
+    for drawer in drawers.values():
         drawer.fetch_args(args)
 
     # setup logging
@@ -64,13 +63,11 @@ def main() -> None:
     loader = setup_loader(args)
 
     # setup tracks
-    if args.from_strava:
-        tracks = loader.load_strava_tracks(args.from_strava)
-    else:
-        tracks = loader.load_tracks(args.gpx_dir)
+    tracks = loader.load_strava_tracks(args.from_strava) if args.from_strava else loader.load_tracks(args.gpx_dir)
     if not tracks:
         if not args.clear_cache:
-            print("No tracks found.")
+            log = logging.getLogger("gpxtrackposter")
+            log.info("No tracks found.")
         return
 
     # setup poster
@@ -89,6 +86,7 @@ def parse_args(args_parser: argparse.ArgumentParser, args: list) -> argparse.Nam
 
     Returns:
         object: Namespace
+
     """
     return args_parser.parse_args(args)
 
@@ -98,6 +96,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     Returns:
         object: ArgumentParser
+
     """
     args_parser = argparse.ArgumentParser(prog=__app_name__)
     args_parser.add_argument(
@@ -282,7 +281,7 @@ def create_parser() -> argparse.ArgumentParser:
     return args_parser
 
 
-def setup_logging(verbose: bool = False, logfile: Optional[str] = None) -> logging.Logger:
+def setup_logging(logfile: str | None = None, verbose: bool = False) -> logging.Logger:
     """Set up logging"""
     log = logging.getLogger("gpxtrackposter")
     log.setLevel(logging.INFO if verbose else logging.ERROR)
@@ -297,20 +296,24 @@ def setup_loader(args: argparse.Namespace) -> track_loader.TrackLoader:
     loader = track_loader.TrackLoader(args.workers)
     loader.set_cache_dir(os.path.join(appdirs.user_cache_dir(__app_name__, __app_author__), "tracks"))
     if not loader.year_range.parse(args.year):
-        raise ParameterError(f"Bad year range: {args.year}.")
+        msg = f"Bad year range: {args.year}."
+        raise ParameterError(msg)
 
     loader.special_file_names = args.special
     loader.set_min_length(args.min_distance * Units().km)
     loader.set_activity(args.activity_type)
     if args.clear_cache:
-        print("Clearing cache...")
+        log = logging.getLogger("gpxtrackposter")
+        log.info("Clearing track cache")
         loader.clear_cache()
     return loader
 
 
-def setup_poster(tracks: List[track_loader.Track], args: argparse.Namespace) -> poster.Poster:
+def setup_poster(tracks: list[track_loader.Track], args: argparse.Namespace) -> poster.Poster:
     """Set up the poster"""
-    print(f"Creating poster of type {args.type} with {len(tracks)} tracks and storing it in file {args.output}...")
+    msg = f"Creating poster of type {args.type} with {len(tracks)} tracks and storing it in file {args.output}..."
+    log = logging.getLogger("gpxtrackposter")
+    log.info(msg)
     p.set_language(args.language, args.localedir)
     p.set_athlete(args.athlete)
     p.set_title(args.title if args.title else p.translate("MY TRACKS"))
@@ -341,5 +344,6 @@ if __name__ == "__main__":
     try:
         main()
     except PosterError as e:
-        print(e)
+        main_log = setup_logging()
+        main_log.error(e)
         sys.exit(1)

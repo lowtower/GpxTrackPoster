@@ -5,9 +5,7 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-from typing import Dict
-
-import svgwrite  # type: ignore
+import svgwrite  # type: ignore[attr-defined]
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError
@@ -22,9 +20,11 @@ class GridDrawer(TracksDrawer):
 
     Methods:
         draw: For each track, draw it on the poster.
+
     """
 
     def __init__(self, the_poster: Poster) -> None:
+        """Initialize the GridDrawer class."""
         super().__init__(the_poster)
 
     def draw(self, dr: svgwrite.Drawing, g: svgwrite.container.Group, size: XY, offset: XY) -> None:
@@ -35,18 +35,21 @@ class GridDrawer(TracksDrawer):
             g: svg group
             size: Size
             offset: Offset
+
         """
         if len(self.poster.tracks) == 0:
-            raise PosterError("No tracks to draw.")
+            msg = "No tracks to draw."
+            raise PosterError(msg)
         cell_size, counts = utils.compute_grid(len(self.poster.tracks), size)
         if cell_size is None or counts is None:
-            raise PosterError("Unable to compute grid.")
+            msg = "Unable to compute grid."
+            raise PosterError(msg)
         count_x, count_y = counts[0], counts[1]
         spacing_x = 0 if count_x <= 1 else (size.x - cell_size * count_x) / (count_x - 1)
         spacing_y = 0 if count_y <= 1 else (size.y - cell_size * count_y) / (count_y - 1)
         offset.x += (size.x - count_x * cell_size - (count_x - 1) * spacing_x) / 2
         offset.y += (size.y - count_y * cell_size - (count_y - 1) * spacing_y) / 2
-        year_groups: Dict[int, svgwrite.container.Group] = {}
+        year_groups: dict[int, svgwrite.container.Group] = {}
         for index, tr in enumerate(self.poster.tracks):
             year = tr.start_time().year
             if year not in year_groups:
@@ -70,8 +73,10 @@ class GridDrawer(TracksDrawer):
         Args:
             dr: svg drawing
             g: svg group
+            tr: track
             size: Size
             offset: Offset
+
         """
         color = self.color(self.poster.length_range, tr.length(), tr.special)
         str_length = utils.format_float(self.poster.m2u(tr.length()))

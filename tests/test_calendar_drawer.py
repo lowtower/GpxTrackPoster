@@ -1,6 +1,4 @@
-"""
-Several tests for CalendarDrawer
-"""
+"""Several tests for CalendarDrawer"""
 
 # Copyright 2022-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
@@ -28,6 +26,7 @@ def test_run_drawer(
     mock_track_instance_amsterdam_paris: MagicMock,
     mocker: MockerFixture,
 ) -> None:
+    """Test run drawer"""
     mocker.patch("svgwrite.Drawing.save", return_value=True)
 
     calendar_drawer.create_args(parser)
@@ -60,6 +59,7 @@ def test_run_drawer_with_animation(
     mock_track_instance_amsterdam_paris: MagicMock,
     mocker: MockerFixture,
 ) -> None:
+    """Test run drawer with animation"""
     mocker.patch("svgwrite.Drawing.save", return_value=True)
 
     calendar_drawer.create_args(parser)
