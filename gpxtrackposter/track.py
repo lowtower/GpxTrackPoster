@@ -14,7 +14,7 @@ import gpxpy  # type: ignore
 import pint  # type: ignore
 import polyline  # type: ignore
 import s2sphere  # type: ignore
-from stravalib.model import DetailedActivity as StravaActivity  # type: ignore
+from stravalib.model import SummaryActivity  # type: ignore
 
 from gpxtrackposter.exceptions import TrackLoadError
 from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
@@ -80,7 +80,7 @@ class Track:
         except Exception as e:
             raise TrackLoadError("Something went wrong when loading GPX.") from e
 
-    def load_strava(self, activity: StravaActivity) -> None:
+    def load_strava(self, activity: SummaryActivity) -> None:
         """Load Strava activity into self.
 
         Args:
