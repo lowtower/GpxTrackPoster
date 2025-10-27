@@ -5,6 +5,8 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from __future__ import annotations
+
 import datetime
 import json
 import os
@@ -14,7 +16,7 @@ import gpxpy  # type: ignore
 import pint  # type: ignore
 import polyline  # type: ignore
 import s2sphere  # type: ignore
-from stravalib.model import Activity as StravaActivity  # type: ignore
+from stravalib.model import SummaryActivity  # type: ignore
 
 from gpxtrackposter.exceptions import TrackLoadError
 from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
@@ -80,7 +82,7 @@ class Track:
         except Exception as e:
             raise TrackLoadError("Something went wrong when loading GPX.") from e
 
-    def load_strava(self, activity: StravaActivity) -> None:
+    def load_strava(self, activity: SummaryActivity) -> None:
         """Load Strava activity into self.
 
         Args:
@@ -88,8 +90,10 @@ class Track:
         """
         # use strava as file name
         self.file_names = [str(activity.id)]
+        if not activity.start_date_local or not activity.distance or not activity.map or not activity.elapsed_time:
+            raise ValueError("Strava activity is not valid!")
         self.set_start_time(activity.start_date_local)
-        self.set_end_time(activity.start_date_local + activity.elapsed_time)
+        self.set_end_time(activity.start_date_local + activity.elapsed_time.timedelta())
         self._length_meters = float(activity.distance)
         summary_polyline = activity.map.summary_polyline
         polyline_data = polyline.decode(summary_polyline) if summary_polyline else []
@@ -112,7 +116,7 @@ class Track:
         assert self._start_time is not None
         return self._start_time
 
-    def set_start_time(self, value: datetime.datetime) -> None:
+    def set_start_time(self, value: datetime.datetime | None) -> None:
         """Set the start time to the given value.
 
         Args:
