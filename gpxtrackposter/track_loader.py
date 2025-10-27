@@ -187,7 +187,7 @@ class TrackLoader:
         client = Client()
         response = client.refresh_access_token(**strava_data)
         client.access_token = response["access_token"]
-        filter_dict = {"before": datetime.datetime.now(datetime.UTC)}
+        filter_dict = {"before": datetime.datetime.now(datetime.timezone.utc)}
         if tracks:
             max_time = max(track.start_time() for track in tracks)
             filter_dict = {"after": max_time - datetime.timedelta(days=2)}
