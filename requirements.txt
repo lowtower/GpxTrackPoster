@@ -3,6 +3,7 @@ colour
 geopy
 gpxpy
 pint
+py-staticmaps
 pytz
 s2sphere
 svgwrite
