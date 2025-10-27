@@ -5,7 +5,7 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import s2sphere  # type: ignore[attr-defined]
+import s2sphere  # type: ignore[import-untyped]
 from dateutil import parser, tz
 
 from gpxtrackposter.timezone_adjuster import TimezoneAdjuster

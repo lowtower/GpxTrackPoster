@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 
-import pint  # type: ignore[attr-defined]
+import pint  # type: ignore[import-untyped]
 
 
 class QuantityRange:

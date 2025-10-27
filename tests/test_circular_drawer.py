@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 from unittest.mock import MagicMock
 
 import pytest
-from pint import Quantity  # type: ignore[attr-defined]
+from pint import Quantity  # type: ignore[import-untyped]
 from pytest_mock import MockerFixture
 
 from gpxtrackposter.circular_drawer import CircularDrawer

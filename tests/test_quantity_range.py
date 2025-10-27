@@ -6,7 +6,7 @@
 # license that can be found in the LICENSE file.
 
 import pytest
-from pint import Quantity  # type: ignore[attr-defined]
+from pint import Quantity  # type: ignore[import-untyped]
 
 from gpxtrackposter.quantity_range import QuantityRange
 

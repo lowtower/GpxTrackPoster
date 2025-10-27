@@ -10,12 +10,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytz
-import timezonefinder  # type: ignore[attr-defined]
+import timezonefinder  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
     import datetime
 
-    import s2sphere  # type: ignore[attr-defined]
+    import s2sphere  # type: ignore[import-untyped]
 
 
 class TimezoneAdjuster:

@@ -9,8 +9,8 @@ import calendar
 import datetime
 import locale
 
-import pint  # type: ignore[attr-defined]
-import svgwrite  # type: ignore[attr-defined]
+import pint  # type: ignore[import-untyped]
+import svgwrite  # type: ignore[import-untyped]
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError

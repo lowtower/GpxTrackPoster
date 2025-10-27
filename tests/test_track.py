@@ -10,8 +10,8 @@ import os
 import re
 
 import pytest
-import s2sphere  # type: ignore[attr-defined]
-from pint import Quantity  # type: ignore[attr-defined]
+import s2sphere  # type: ignore[import-untyped]
+from pint import Quantity  # type: ignore[import-untyped]
 
 from gpxtrackposter.exceptions import TrackLoadError
 from gpxtrackposter.track import Track

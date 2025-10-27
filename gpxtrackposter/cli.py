@@ -13,7 +13,7 @@ import logging
 import os
 import sys
 
-import appdirs  # type: ignore[attr-defined]
+import appdirs  # type: ignore[import-untyped]
 
 from gpxtrackposter import (
     calendar_drawer,

@@ -12,8 +12,8 @@ import datetime
 import math
 from typing import TYPE_CHECKING
 
-import pint  # type: ignore[attr-defined]
-import svgwrite  # type: ignore[attr-defined]
+import pint  # type: ignore[import-untyped]
+import svgwrite  # type: ignore[import-untyped]
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError
@@ -249,7 +249,7 @@ class CircularDrawer(TracksDrawer):
         if self._max_distance:
             max_length = self._max_distance
         assert max_length is not None
-        max_length = max_length.to(self._unit)  # type: ignore[attr-defined]
+        max_length = max_length.to(self._unit)  # type: ignore[import-untyped]
         ring_distance = self._determine_ring_distance(max_length)
         if ring_distance is None:
             return
@@ -266,7 +266,7 @@ class CircularDrawer(TracksDrawer):
                     stroke_width=0.3,
                 )
             )
-            distance += ring_distance  # type: ignore[attr-defined]
+            distance += ring_distance  # type: ignore[import-untyped]
 
     def _draw_circle_segment(
         self,
@@ -285,7 +285,7 @@ class CircularDrawer(TracksDrawer):
         color = self.color(self.poster.length_range_by_date, length, has_special)
         max_length = self.poster.length_range_by_date.upper()
         if self._max_distance:
-            max_length = self._max_distance.to_base_units()  # type: ignore[attr-defined]
+            max_length = self._max_distance.to_base_units()  # type: ignore[import-untyped]
         assert max_length is not None
         r1 = rr.lower()
         assert r1 is not None

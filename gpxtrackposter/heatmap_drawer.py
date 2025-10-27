@@ -15,10 +15,10 @@ import uuid
 from operator import itemgetter
 from typing import TYPE_CHECKING
 
-import s2sphere  # type: ignore[attr-defined]
-import staticmaps  # type: ignore[attr-defined]
-from geopy.distance import distance  # type: ignore[attr-defined]
-from PIL import Image  # type: ignore[attr-defined]
+import s2sphere  # type: ignore[import-untyped]
+import staticmaps  # type: ignore[import-untyped]
+from geopy.distance import distance  # type: ignore[import-untyped]
+from PIL import Image  # type: ignore[import-untyped]
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import ParameterError, PosterError
@@ -28,7 +28,7 @@ from gpxtrackposter.xy import XY
 if TYPE_CHECKING:
     import argparse
 
-    import svgwrite  # type: ignore[attr-defined]
+    import svgwrite  # type: ignore[import-untyped]
 
     from gpxtrackposter.poster import Poster
 
@@ -410,7 +410,7 @@ class HeatmapDrawer(TracksDrawer):
         )
 
         # TODO: remove testing code
-        from staticmaps.color import BLACK, RED  # type: ignore[attr-defined]
+        from staticmaps.color import BLACK, RED  # type: ignore[import-untyped]
 
         self._tile_context.add_object(staticmaps.Line([bbox.lo(), bbox.hi()], RED, 1))
         self._tile_context.add_object(

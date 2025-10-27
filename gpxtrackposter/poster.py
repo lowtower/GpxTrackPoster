@@ -13,8 +13,8 @@ import logging
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-import pint  # type: ignore[attr-defined]
-import svgwrite  # type: ignore[attr-defined]
+import pint  # type: ignore[import-untyped]
+import svgwrite  # type: ignore[import-untyped]
 
 from gpxtrackposter.quantity_range import QuantityRange
 from gpxtrackposter.units import Units
@@ -73,7 +73,7 @@ class Poster:
         self.tracks: list[Track] = []
         self.length_range: QuantityRange = QuantityRange()
         self.length_range_by_date: QuantityRange = QuantityRange()
-        self.total_length_year_dict: dict[int, pint.Quantity] = defaultdict(int)  # type: ignore[attr-defined]
+        self.total_length_year_dict: dict[int, pint.Quantity] = defaultdict(int)  # type: ignore[import-untyped]
         self.units: str = "metric"
         self.colors: dict = {
             "background": "#222222",
@@ -417,7 +417,7 @@ class Poster:
         weeks = {}
         for t in self.tracks:
             total_length += t.length()
-            self.total_length_year_dict[t.start_time().year] += t.length()  # type: ignore[attr-defined]
+            self.total_length_year_dict[t.start_time().year] += t.length()  # type: ignore[import-untyped]
             length_range.extend(t.length())
             # time.isocalendar()[1] -> week number
             weeks[(t.start_time().year, t.start_time().isocalendar()[1])] = 1

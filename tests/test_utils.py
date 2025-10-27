@@ -8,7 +8,7 @@
 import math
 
 import pytest
-import s2sphere  # type: ignore[attr-defined]
+import s2sphere  # type: ignore[import-untyped]
 
 from gpxtrackposter.utils import (
     compute_bounds_xy,

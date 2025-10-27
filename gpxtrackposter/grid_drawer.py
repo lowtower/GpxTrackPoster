@@ -5,7 +5,7 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import svgwrite  # type: ignore[attr-defined]
+import svgwrite  # type: ignore[import-untyped]
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError

@@ -13,10 +13,10 @@ from itertools import count as itercount
 from itertools import takewhile
 from typing import TYPE_CHECKING
 
-import colour  # type: ignore[attr-defined]
+import colour  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
-    import s2sphere  # type: ignore[attr-defined]
+    import s2sphere  # type: ignore[import-untyped]
 
 from gpxtrackposter.value_range import ValueRange
 from gpxtrackposter.xy import XY

@@ -14,7 +14,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-import s2sphere  # type: ignore[attr-defined]
+import s2sphere  # type: ignore[import-untyped]
 from pytest_mock import MockerFixture
 
 from gpxtrackposter.calendar_drawer import CalendarDrawer

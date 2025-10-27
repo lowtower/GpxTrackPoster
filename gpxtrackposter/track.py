@@ -12,17 +12,17 @@ import json
 import os
 from typing import TYPE_CHECKING
 
-import gpxpy  # type: ignore[attr-defined]
-import polyline  # type: ignore[attr-defined]
-import s2sphere  # type: ignore[attr-defined]
+import gpxpy  # type: ignore[import-untyped]
+import polyline  # type: ignore[import-untyped]
+import s2sphere  # type: ignore[import-untyped]
 
 from gpxtrackposter.exceptions import TrackLoadError
 from gpxtrackposter.units import Units
 
 if TYPE_CHECKING:
-    import pint  # type: ignore[attr-defined]
+    import pint  # type: ignore[import-untyped]
     from stravalib.model import (
-        SummaryActivity as StravaActivity,  # type: ignore[attr-defined]
+        SummaryActivity as StravaActivity,  # type: ignore[import-untyped]
     )
 
     from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
@@ -208,7 +208,7 @@ class Track:
             msg = "Track has no start or end time."
             raise TrackLoadError(msg)
         if timezone_adjuster:
-            lat, _, lng, _ = list(gpx.get_bounds())  # type: ignore[attr-defined]
+            lat, _, lng, _ = list(gpx.get_bounds())  # type: ignore[import-untyped]
             latlng = s2sphere.LatLng.from_degrees(lat, lng)
             self.set_start_time(timezone_adjuster.adjust(self.start_time(), latlng))
             self.set_end_time(timezone_adjuster.adjust(self.end_time(), latlng))

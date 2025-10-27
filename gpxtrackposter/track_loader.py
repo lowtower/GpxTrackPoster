@@ -16,8 +16,8 @@ import os
 import shutil
 from typing import TYPE_CHECKING, Any
 
-import s2sphere  # type: ignore[attr-defined]
-from stravalib import Client  # type: ignore[attr-defined]
+import s2sphere  # type: ignore[import-untyped]
+from stravalib import Client  # type: ignore[import-untyped]
 
 from gpxtrackposter.exceptions import ParameterError, TrackLoadError
 from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
@@ -28,7 +28,7 @@ from gpxtrackposter.year_range import YearRange
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    import pint  # type: ignore[attr-defined]
+    import pint  # type: ignore[import-untyped]
 
 log = logging.getLogger("gpxtrackposter")
 
@@ -208,7 +208,7 @@ class TrackLoader:
         if tracks:
             max_time = max(track.start_time() for track in tracks)
             filter_dict = {"after": max_time - datetime.timedelta(days=2)}
-        for activity in client.get_activities(**filter_dict):  # type: ignore[attr-defined]
+        for activity in client.get_activities(**filter_dict):  # type: ignore[import-untyped]
             # tricky to pass the timezone
             if str(activity.id) in tracks_names:
                 continue
