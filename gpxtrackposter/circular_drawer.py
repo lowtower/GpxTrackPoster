@@ -249,7 +249,7 @@ class CircularDrawer(TracksDrawer):
         if self._max_distance:
             max_length = self._max_distance
         assert max_length is not None
-        max_length = max_length.to(self._unit)  # type: ignore[import-untyped]
+        max_length = max_length.to(self._unit)  # type: ignore[assignment]
         ring_distance = self._determine_ring_distance(max_length)
         if ring_distance is None:
             return
