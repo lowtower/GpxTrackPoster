@@ -49,10 +49,14 @@ usage: create_poster [-h] [--gpx-dir DIR] [--output FILE]
                      [--animation-time ANIMATION_TIME]
                      [--heatmap-center LAT,LNG] [--heatmap-radius RADIUS_KM]
                      [--heatmap-line-transparency-width TRANSP_1,WIDTH_1, TRANSP_2,WIDTH_2, TRANSP_3,WIDTH_3]
-                     [--circular-rings] [--circular-ring-color COLOR]
+                     [--heatmap-tile-provider TILE_PROVIDER]
+                     [--heatmap-tile-max-size PIXEL]
+                     [--heatmap-tile-renderer RENDERER]
+                     [--circular-rings]
+                     [--circular-ring-color COLOR]
                      [--circular-ring-max-distance DISTANCE]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --gpx-dir DIR         Directory containing GPX files (default: current
                         directory).
@@ -113,6 +117,19 @@ Heatmap Type Options:
                         Define three transparency and width tuples for the
                         heatmap lines or set it to `automatic` for automatic
                         calculation (default: 0.1,5.0, 0.2,2.0, 1.0,0.3).
+  --heatmap-tile-provider TILE_PROVIDER
+                        Optionally, choose a tile provider from the list for a
+                        background map image: osm, stamen-terrain, stamen-
+                        toner, stamen-toner-lite, arcgis-worldimagery, carto-
+                        nolabels, carto-darknolabels, none. (Default: None)
+  --heatmap-tile-max-size PIXEL
+                        Set the maximum background image size (which is
+                        afterwards scaled to the poster size). This setting
+                        defines how much details will be shown on the map. Be
+                        sure to choose a reasonable value! (default: 1200 px)
+  --heatmap-tile-renderer RENDERER
+                        Choose a renderer for generating the background image,
+                        one of pillow, cairo. (default: pillow)
 
 Circular Type Options:
   --circular-rings      Draw distance rings.
