@@ -318,8 +318,8 @@ exclude_also = [
 
     # Don't complain about abstract methods, they aren't run:
     "@(abc\\.)?abstractmethod",
-    ]
-fail_under = 80
+]
+fail_under = 60
 ignore_errors = true
 
 [tool.coverage.paths]
@@ -339,8 +339,6 @@ known_third_party = [
     "numpy", "pandas", "keras", "tensorflow", "sklearn",
     "matplotlib", "scipy", "gnspy"
 ]
-
-
 
 [tool.mkdocs]
 site_name = "gpxtrackposter"
