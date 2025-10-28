@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 def mock_activity(mocker: MockerFixture, activity_type: str | list) -> MagicMock:
     """Mock Activity"""
     activity = mocker.MagicMock()
-    activity.type = activity_type
+    activity.type.root = activity_type
     return activity
 
 

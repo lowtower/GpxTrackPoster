@@ -213,7 +213,11 @@ class TrackLoader:
             if str(activity.id) in tracks_names:
                 continue
             # pylint: disable=superfluous-parens
-            if filter_type and activity.type not in ([filter_type] if isinstance(filter_type, str) else filter_type):
+            if (
+                filter_type
+                and activity.type
+                and activity.type.root not in ([filter_type] if isinstance(filter_type, str) else filter_type)
+            ):
                 continue
             t = Track()
             t.load_strava(activity)
