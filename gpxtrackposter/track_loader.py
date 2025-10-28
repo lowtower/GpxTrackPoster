@@ -208,7 +208,7 @@ class TrackLoader:
         if tracks:
             max_time = max(track.start_time() for track in tracks)
             filter_dict = {"after": max_time - datetime.timedelta(days=2)}
-        for activity in client.get_activities(**filter_dict):  # type: ignore[import-untyped]
+        for activity in client.get_activities(**filter_dict):  # type: ignore[arg-type]
             # tricky to pass the timezone
             if str(activity.id) in tracks_names:
                 continue

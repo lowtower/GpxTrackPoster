@@ -11,13 +11,13 @@ import sys
 
 usage = sys.stdin.read()
 if not usage.startswith("usage: create_poster"):
-    msg = "Bad usage info from stdin"
-    raise RuntimeError(msg)
+    msg = "Bad usage info from stdin"  # pylint: disable=invalid-name
+    raise RuntimeError(msg)  # pylint: disable=invalid-name
 
 readme_md_file_name = sys.argv[1]
 if not readme_md_file_name.endswith("README.md"):
-    msg = f"Bad README.md file: {readme_md_file_name}"
-    raise RuntimeError(msg)
+    msg = f"Bad README.md file: {readme_md_file_name}"  # pylint: disable=invalid-name
+    raise RuntimeError(msg)  # pylint: disable=invalid-name
 
 # replace usage in README.md
 with open(readme_md_file_name, encoding="utf8") as f:

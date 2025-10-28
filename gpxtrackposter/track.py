@@ -207,8 +207,9 @@ class Track:
         if not self.has_time():
             msg = "Track has no start or end time."
             raise TrackLoadError(msg)
-        if timezone_adjuster:
-            lat, _, lng, _ = list(gpx.get_bounds())  # type: ignore[import-untyped]
+        bounds = gpx.get_bounds()
+        if bounds and timezone_adjuster:
+            lat, lng = bounds.min_latitude, bounds.min_longitude
             latlng = s2sphere.LatLng.from_degrees(lat, lng)
             self.set_start_time(timezone_adjuster.adjust(self.start_time(), latlng))
             self.set_end_time(timezone_adjuster.adjust(self.end_time(), latlng))
