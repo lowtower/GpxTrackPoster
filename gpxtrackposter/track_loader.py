@@ -1,6 +1,5 @@
 """Handle parsing of GPX files and writing/loading of cached data"""
 
-
 # Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
