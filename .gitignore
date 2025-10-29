@@ -58,7 +58,9 @@ sdist
 .mypy_cache/*
 
 # Project specific
+.env
 site/*
+gpx/*
 gpx_dir/*
 output/*
 data
