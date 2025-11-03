@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Bump year"""
+
 # Copyright 2018-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -8,16 +10,32 @@
 import datetime
 import re
 import sys
+from pathlib import Path
 
 THIS_YEAR = str(datetime.datetime.now().year)
 re_year = re.compile(r"\s(\d\d\d\d) Florian Pigorsch")
 re_year_range = re.compile(r"\s(\d\d\d\d)-(\d\d\d\d) Florian Pigorsch")
 
 
-def bump_year(file_name: str) -> None:
+def bump_year(path: str) -> None:
+    """Bump year in a file or all files in a directory."""
+    path_obj = Path(path)
+
+    if path_obj.is_dir():
+        for file in path_obj.glob("**/*"):  # You can filter with "*.txt" or similar
+            if file.is_file() and file.suffix != ".pyc":
+                _bump_year_in_file(file)
+    elif path_obj.is_file():
+        _bump_year_in_file(path_obj)
+    else:
+        msg = f"Path '{path}' is neither a file nor a directory."
+        raise ValueError(msg)
+
+
+def _bump_year_in_file(file_path: Path) -> None:
     lines = []
-    with open(file_name, "r", encoding="utf8") as f:
-        for line in f.readlines():
+    with file_path.open(encoding="utf8") as f:
+        for line in f:
             m = re_year.search(line)
             if m and (m.group(1) != THIS_YEAR):
                 start, end = m.span(1)
@@ -32,9 +50,10 @@ def bump_year(file_name: str) -> None:
 
             lines.append(line)
 
-    with open(file_name, "w", encoding="utf8") as f:
+    with file_path.open("w", encoding="utf8") as f:
         f.writelines(lines)
 
 
-for arg in sys.argv:
-    bump_year(arg)
+if __name__ == "__main__":
+    for arg in sys.argv:
+        bump_year(arg)

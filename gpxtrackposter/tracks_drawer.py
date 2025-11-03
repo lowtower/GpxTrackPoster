@@ -7,8 +7,8 @@
 
 import argparse
 
-import pint  # type: ignore
-import svgwrite  # type: ignore
+import pint  # type: ignore[import-untyped]
+import svgwrite  # type: ignore[import-untyped]
 
 from gpxtrackposter import utils
 from gpxtrackposter.poster import Poster
@@ -19,7 +19,8 @@ from gpxtrackposter.xy import XY
 class TracksDrawer:
     """Base class that other drawer classes inherit from."""
 
-    def __init__(self, the_poster: Poster):
+    def __init__(self, the_poster: Poster) -> None:
+        """Initialize the TracksDrawer class."""
         self.poster = the_poster
 
     def create_args(self, args_parser: argparse.ArgumentParser) -> None:
@@ -27,6 +28,7 @@ class TracksDrawer:
 
         Args:
             args_parser: ArgumentParser
+
         """
 
     def fetch_args(self, args: argparse.Namespace) -> None:
@@ -45,6 +47,7 @@ class TracksDrawer:
             g: svg group
             size: Size
             offset: Offset
+
         """
         g.add(dr.rect((offset.x, offset.y), (size.x, size.y), fill=self.poster.colors["background"]))
 
@@ -56,6 +59,7 @@ class TracksDrawer:
             g: svg group
             size: Size
             offset: Offset
+
         """
 
     def color(self, length_range: QuantityRange, length: pint.Quantity, is_special: bool = False) -> str:
@@ -68,6 +72,7 @@ class TracksDrawer:
 
         Returns:
             str: Track color.
+
         """
         color1 = self.poster.colors["special"] if is_special else self.poster.colors["track"]
         color2 = self.poster.colors["special2"] if is_special else self.poster.colors["track2"]

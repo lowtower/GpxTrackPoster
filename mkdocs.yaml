@@ -1,50 +1,49 @@
 site_name: gpxtrackposter
-site_description: "Create a visually appealing poster from your GPX tracks"
-
+site_description: Create a visually appealing poster from your GPX tracks
 repo_url: https://github.com/lowtower/gpxtrackposter
 repo_name: gpxtrackposter
-
 use_directory_urls: false
 
 theme:
+  name: material
   icon:
     repo: fontawesome/brands/github
-  name: "material"
   palette:
     - media: "(prefers-color-scheme: light)"
-      primary: "blue"
-      accent: "grey"
       scheme: default
+      primary: blue
+      accent: grey
       toggle:
         icon: material/toggle-switch-off-outline
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
-      primary: "blue"
-      accent: "white"
       scheme: slate
+      primary: blue
+      accent: white
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
-
 plugins:
   - search
   - autorefs
   - section-index
   - gen-files:
       scripts:
-      - docs/gen_ref_pages.py
+        - docs/gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
   - mkdocstrings:
       default_handler: python
       handlers:
         python:
-          paths: [gpxtrackposter]
-          options:
-            show_root_heading: true
-            show_source: true
+          paths:
+            - gpxtrackposter
+      options:
+        show_root_heading: true
+        show_source: true
       watch:
-        - gpxtrackposter
+        paths:
+          - gpxtrackposter
 
 markdown_extensions:
   - pymdownx.highlight

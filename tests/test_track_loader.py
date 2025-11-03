@@ -1,31 +1,34 @@
-"""
-Several tests for TrackLoader
-"""
+"""Several tests for TrackLoader"""
 
 # Copyright 2020-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from __future__ import annotations
+
 import json
 import os
-from pathlib import Path
-from typing import Dict, List, Union
-from unittest.mock import MagicMock
+from typing import TYPE_CHECKING
 
 import pytest
-from pytest_mock import MockerFixture
 
 from gpxtrackposter.exceptions import ParameterError
 from gpxtrackposter.track_loader import TrackLoader
 from gpxtrackposter.units import Units
 from gpxtrackposter.year_range import YearRange
 
+if TYPE_CHECKING:
+    from pathlib import Path
+    from unittest.mock import MagicMock
 
-def mock_activity(mocker: MockerFixture, activity_type: Union[str, list]) -> MagicMock:
+    from pytest_mock import MockerFixture
+
+
+def mock_activity(mocker: MockerFixture, activity_type: str | list) -> MagicMock:
     """Mock Activity"""
     activity = mocker.MagicMock()
-    activity.type = activity_type
+    activity.type.root = activity_type
     return activity
 
 
@@ -47,9 +50,9 @@ def fixture_mock_hike_activity(mocker: MockerFixture) -> MagicMock:
     return mock_activity(mocker, "Hike")
 
 
-def strava_config(tmp_path: Path, activity_type: Union[str, List[str], None] = None) -> str:
+def strava_config(tmp_path: Path, activity_type: str | list[str] | None = None) -> str:
     """Strava config"""
-    config: Dict[str, Union[str, List[str]]] = {
+    config: dict[str, str | list[str]] = {
         "client_id": "YOUR STRAVA API CLIENT ID",
         "client_secret": "YOUR STRAVA API CLIENT SECRET",
         "refresh_token": "YOUR STRAVA REFRESH TOKEN",
@@ -98,6 +101,7 @@ def test_load_strava_tracks_without_activity_type_filter(
     mock_walk_activity: MagicMock,
     mock_hike_activity: MagicMock,
 ) -> None:
+    """Test load_strava_tracks without activity type filter"""
     loader.load_strava_tracks(strava_config_without_type_filter)
 
     mock_track_instance.load_strava.assert_any_call(mock_run_activity)
@@ -111,6 +115,7 @@ def test_load_strava_tracks_with_str_activity_type_filter(
     mock_track_instance: MagicMock,
     mock_run_activity: MagicMock,
 ) -> None:
+    """Test load_strava_tracks with str activity type filter"""
     loader.load_strava_tracks(strava_config_with_run_type_filter)
 
     mock_track_instance.load_strava.assert_called_once_with(mock_run_activity)
@@ -123,6 +128,7 @@ def test_load_strava_tracks_with_list_activity_type_filter(
     mock_walk_activity: MagicMock,
     mock_hike_activity: MagicMock,
 ) -> None:
+    """Test load strava tracks with list activity type filter"""
     loader.load_strava_tracks(strava_config_with_walk_hike_type_filter)
 
     mock_track_instance.load_strava.assert_any_call(mock_walk_activity)
@@ -130,6 +136,7 @@ def test_load_strava_tracks_with_list_activity_type_filter(
 
 
 def test_init() -> None:
+    """Test initialization"""
     loader = TrackLoader(workers=1)
     assert len(loader.special_file_names) == 0
     assert loader.year_range == YearRange()

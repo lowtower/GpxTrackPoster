@@ -10,17 +10,22 @@ from __future__ import annotations
 import datetime
 import json
 import os
-from typing import List, Optional
+from typing import TYPE_CHECKING
 
-import gpxpy  # type: ignore
-import pint  # type: ignore
-import polyline  # type: ignore
-import s2sphere  # type: ignore
-from stravalib.model import SummaryActivity  # type: ignore
+import gpxpy  # type: ignore[import-untyped]
+import polyline  # type: ignore[import-untyped]
+import s2sphere  # type: ignore[import-untyped]
 
 from gpxtrackposter.exceptions import TrackLoadError
-from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
 from gpxtrackposter.units import Units
+
+if TYPE_CHECKING:
+    import pint  # type: ignore[import-untyped]
+    from stravalib.model import (
+        SummaryActivity as StravaActivity,  # type: ignore[import-untyped]
+    )
+
+    from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
 
 
 class Track:
@@ -41,20 +46,22 @@ class Track:
         append: Append other track to current track.
         load_cache: Load track from cached json data.
         store_cache: Cache the current track.
+
     """
 
     def __init__(self) -> None:
-        self.file_names: List[str] = []
-        self.polylines: List[List[s2sphere.LatLng]] = []
-        self._start_time: Optional[datetime.datetime] = None
-        self._end_time: Optional[datetime.datetime] = None
+        """Initialize the Track class."""
+        self.file_names: list[str] = []
+        self.polylines: list[list[s2sphere.LatLng]] = []
+        self._start_time: datetime.datetime | None = None
+        self._end_time: datetime.datetime | None = None
         # Don't use Units().meter here, as this constructor is called from
         # within a thread (which would create a second unit registry!)
         self._length_meters = 0.0
         self.special = False
         self.activity_type = None
 
-    def load_gpx(self, file_name: str, timezone_adjuster: Optional[TimezoneAdjuster]) -> None:
+    def load_gpx(self, file_name: str, timezone_adjuster: TimezoneAdjuster | None) -> None:
         """Load the GPX file into self.
 
         Args:
@@ -64,34 +71,41 @@ class Track:
         Raises:
             TrackLoadError: An error occurred while parsing the GPX file (empty or bad format).
             PermissionError: An error occurred while opening the GPX file.
+
         """
         try:
             self.file_names = [os.path.basename(file_name)]
             # Handle empty gpx files
             # (for example, treadmill runs pulled via garmin-connect-export)
             if os.path.getsize(file_name) == 0:
-                raise TrackLoadError("Empty GPX file")
-            with open(file_name, "r", encoding="utf8") as file:
+                msg = "Empty GPX file"
+                raise TrackLoadError(msg)
+            with open(file_name, encoding="utf8") as file:
                 self._load_gpx_data(gpxpy.parse(file), timezone_adjuster)
-        except TrackLoadError as e:
-            raise e
+        except TrackLoadError:
+            raise
         except gpxpy.gpx.GPXXMLSyntaxException as e:
-            raise TrackLoadError("Failed to parse GPX.") from e
+            msg = "Failed to parse GPX."
+            raise TrackLoadError(msg) from e
         except PermissionError as e:
-            raise TrackLoadError("Cannot load GPX (bad permissions)") from e
+            msg = "Cannot load GPX (bad permissions)"
+            raise TrackLoadError(msg) from e
         except Exception as e:
-            raise TrackLoadError("Something went wrong when loading GPX.") from e
+            msg = "Something went wrong when loading GPX."
+            raise TrackLoadError(msg) from e
 
-    def load_strava(self, activity: SummaryActivity) -> None:
+    def load_strava(self, activity: StravaActivity) -> None:
         """Load Strava activity into self.
 
         Args:
             activity: Strava activity
+
         """
         # use strava as file name
         self.file_names = [str(activity.id)]
         if not activity.start_date_local or not activity.distance or not activity.map or not activity.elapsed_time:
-            raise ValueError("Strava activity is not valid!")
+            msg = "Strava activity is not valid!"
+            raise ValueError(msg)
         self.set_start_time(activity.start_date_local)
         self.set_end_time(activity.start_date_local + activity.elapsed_time.timedelta())
         self._length_meters = float(activity.distance)
@@ -104,6 +118,7 @@ class Track:
 
         Returns:
             bool: True if track has at least one time, either start or end time.
+
         """
         return self._start_time is not None and self._end_time is not None
 
@@ -112,6 +127,7 @@ class Track:
 
         Returns:
             datetime.datetime: The start time.
+
         """
         assert self._start_time is not None
         return self._start_time
@@ -121,6 +137,7 @@ class Track:
 
         Args:
             value: The start time value.
+
         """
         self._start_time = value
 
@@ -129,6 +146,7 @@ class Track:
 
         Returns:
             datetime.datetime: The end time.
+
         """
         assert self._end_time is not None
         return self._end_time
@@ -138,6 +156,7 @@ class Track:
 
         Args:
             value: The end time value.
+
         """
         self._end_time = value
 
@@ -147,6 +166,7 @@ class Track:
 
         Returns:
             float: The track length in meters.
+
         """
         return self._length_meters
 
@@ -156,6 +176,7 @@ class Track:
 
         Args:
             value: The track length in meters.
+
         """
         self._length_meters = value
 
@@ -164,6 +185,7 @@ class Track:
 
         Returns:
             pint.Quantity: The track length.
+
         """
         return self._length_meters * Units().meter
 
@@ -172,6 +194,7 @@ class Track:
 
         Returns:
             s2sphere.LatLngRect: The smallest rectangle that contains the entire track (border box).
+
         """
         bbox = s2sphere.LatLngRect()
         for line in self.polylines:
@@ -179,18 +202,21 @@ class Track:
                 bbox = bbox.union(s2sphere.LatLngRect.from_point(latlng.normalized()))
         return bbox
 
-    def _load_gpx_data(self, gpx: gpxpy.gpx.GPX, timezone_adjuster: Optional[TimezoneAdjuster]) -> None:
+    def _load_gpx_data(self, gpx: gpxpy.gpx.GPX, timezone_adjuster: TimezoneAdjuster | None) -> None:
         self._start_time, self._end_time = gpx.get_time_bounds()
         if not self.has_time():
-            raise TrackLoadError("Track has no start or end time.")
-        if timezone_adjuster:
-            lat, _, lng, _ = list(gpx.get_bounds())  # type: ignore
+            msg = "Track has no start or end time."
+            raise TrackLoadError(msg)
+        bounds = gpx.get_bounds()
+        if bounds and timezone_adjuster:
+            lat, lng = bounds.min_latitude, bounds.min_longitude
             latlng = s2sphere.LatLng.from_degrees(lat, lng)
             self.set_start_time(timezone_adjuster.adjust(self.start_time(), latlng))
             self.set_end_time(timezone_adjuster.adjust(self.end_time(), latlng))
         self._length_meters = gpx.length_2d()
         if self._length_meters <= 0:
-            raise TrackLoadError("Track is empty.")
+            msg = "Track is empty."
+            raise TrackLoadError(msg)
         gpx.simplify()
         for t in gpx.tracks:
             for s in t.segments:
@@ -199,11 +225,12 @@ class Track:
         if gpx.tracks[0].type:
             self.activity_type = gpx.tracks[0].type.lower()
 
-    def append(self, other: "Track") -> None:
+    def append(self, other: Track) -> None:
         """Append other track to self.
 
         Args:
             other: Other track to append.
+
         """
         self._end_time = other.end_time()
         self.polylines.extend(other.polylines)
@@ -219,6 +246,7 @@ class Track:
 
         Raises:
             TrackLoadError: An error occurred while loading the track data from the cache file.
+
         """
         try:
             with open(cache_file_name, encoding="utf8") as data_file:
@@ -232,21 +260,24 @@ class Track:
                         [s2sphere.LatLng.from_degrees(float(d["lat"]), float(d["lng"])) for d in data_line]
                     )
         except Exception as e:
-            raise TrackLoadError("Failed to load track data from cache.") from e
+            msg = "Failed to load track data from cache."
+            raise TrackLoadError(msg) from e
 
     def store_cache(self, cache_file_name: str) -> None:
         """Cache the current track.
 
         Args:
             cache_file_name: The name of the cache file.
+
         """
         dir_name = os.path.dirname(cache_file_name)
         if not os.path.isdir(dir_name):
             os.makedirs(dir_name)
         with open(cache_file_name, "w", encoding="utf8") as json_file:
-            lines_data = []
-            for line in self.polylines:
-                lines_data.append([{"lat": latlng.lat().degrees, "lng": latlng.lng().degrees} for latlng in line])
+            lines_data = [
+                [{"lat": latlng.lat().degrees, "lng": latlng.lng().degrees} for latlng in line]
+                for line in self.polylines
+            ]
             json.dump(
                 {
                     "start": self.start_time().strftime("%Y-%m-%d %H:%M:%S"),

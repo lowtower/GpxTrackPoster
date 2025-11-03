@@ -5,7 +5,7 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-from typing import Optional
+from __future__ import annotations
 
 
 class ValueRange:
@@ -25,14 +25,16 @@ class ValueRange:
         extend: Adjust the range to include value.
         interpolate: Return interpolated value.
         relative_position: Return relative position of value with respect to lower and upper of ValueRange
+
     """
 
     def __init__(self) -> None:
-        self._lower: Optional[float] = None
-        self._upper: Optional[float] = None
+        """Create a new ValueRange object."""
+        self._lower: float | None = None
+        self._upper: float | None = None
 
     @classmethod
-    def from_pair(cls, value1: float, value2: float) -> "ValueRange":
+    def from_pair(cls, value1: float, value2: float) -> ValueRange:
         """Create a value range from a pair of values.
 
         Args:
@@ -41,6 +43,7 @@ class ValueRange:
 
         Returns:
             ValueRange: Created value range
+
         """
         r = cls()
         r.extend(value1)
@@ -57,22 +60,25 @@ class ValueRange:
 
         Returns:
             bool: Is the value range valid or not.
+
         """
         return self._lower is not None
 
-    def lower(self) -> Optional[float]:
+    def lower(self) -> float | None:
         """Returns the lower value of the value range.
 
         Returns:
-            Optional[float]: The lower value of the value range.
+            float | None: The lower value of the value range.
+
         """
         return self._lower
 
-    def upper(self) -> Optional[float]:
+    def upper(self) -> float | None:
         """Returns the upper value of the value range.
 
         Returns:
-            Optional[float]: The upper value of the value range.
+            float | None: The upper value of the value range.
+
         """
         return self._upper
 
@@ -80,7 +86,8 @@ class ValueRange:
         """Returns the diameter value of the value range.
 
         Returns:
-            Optional[float]: The diameter value of the value range.
+            float | None: The diameter value of the value range.
+
         """
         if self.is_valid():
             assert self._upper is not None
@@ -96,6 +103,7 @@ class ValueRange:
 
         Returns:
             bool: Value range contains the value or not.
+
         """
         if not self.is_valid():
             return False
@@ -109,6 +117,7 @@ class ValueRange:
 
         Args:
             value: Value to extend the value range with.
+
         """
         if not self.is_valid():
             self._lower = value
@@ -130,9 +139,11 @@ class ValueRange:
 
         Raises:
             ValueError: Value range cannot be interpolated.
+
         """
         if not self.is_valid():
-            raise ValueError("Cannot interpolate invalid ValueRange")
+            msg = "Cannot interpolate invalid ValueRange"
+            raise ValueError(msg)
         assert self._lower is not None
         assert self._upper is not None
         return self._lower + relative * (self._upper - self._lower)
@@ -148,9 +159,11 @@ class ValueRange:
 
         Raises:
             ValueError: Relative position cannot be evaluated from the value range.
+
         """
         if not self.is_valid():
-            raise ValueError("Cannot get relative_position for invalid ValueRange")
+            msg = "Cannot get relative_position for invalid ValueRange"
+            raise ValueError(msg)
         assert self._lower is not None
         assert self._upper is not None
         if value <= self._lower:

@@ -1,26 +1,31 @@
-"""
-Several tests for HeatmapDrawer
-"""
+"""Several tests for HeatmapDrawer"""
 
 # Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from __future__ import annotations
+
+import logging
 import math
-from argparse import ArgumentParser
-from typing import List, Optional
-from unittest.mock import MagicMock
+from typing import TYPE_CHECKING
 
 import pytest
-import s2sphere  # type: ignore
-from pytest_mock import MockerFixture
+import s2sphere  # type: ignore[import-untyped]
 
 from gpxtrackposter.cli import parse_args
 from gpxtrackposter.exceptions import ParameterError, PosterError
 from gpxtrackposter.heatmap_drawer import HeatmapDrawer
-from gpxtrackposter.poster import Poster
 from gpxtrackposter.units import Units
+
+if TYPE_CHECKING:
+    from argparse import ArgumentParser
+    from unittest.mock import MagicMock
+
+    from pytest_mock import MockerFixture
+
+    from gpxtrackposter.poster import Poster
 
 
 @pytest.mark.parametrize(
@@ -30,6 +35,7 @@ from gpxtrackposter.units import Units
 def test_validate_heatmap_center_with_invalid_center_string_raises_exception(
     invalid_center: str, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test invalid center string raises ValueError"""
     with pytest.raises(ParameterError):
         heatmap_drawer.validate_heatmap_center(invalid_center)
 
@@ -41,6 +47,7 @@ def test_validate_heatmap_center_with_invalid_center_string_raises_exception(
 def test_validate_heatmap_center_with_invalid_center_type_raises_exception(
     invalid_center: str, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test invalid center type raises ValueError"""
     with pytest.raises(ParameterError):
         heatmap_drawer.validate_heatmap_center(invalid_center)
 
@@ -52,6 +59,7 @@ def test_validate_heatmap_center_with_invalid_center_type_raises_exception(
 def test_validate_heatmap_center_with_invalid_center_values_raises_exception(
     invalid_center: str, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test invalid center values raises ValueError"""
     with pytest.raises(ParameterError):
         heatmap_drawer.validate_heatmap_center(invalid_center)
 
@@ -70,17 +78,20 @@ def test_validate_heatmap_center_with_invalid_center_values_raises_exception(
 def test_validate_heatmap_center_with_valid_center_returns_center(
     valid_center: str, expected_result: s2sphere.LatLng, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test that valid center returns center"""
     assert expected_result == heatmap_drawer.validate_heatmap_center(valid_center)
 
 
 def test_validate_heatmap_radius_with_invalid_value_raises_exception(heatmap_drawer: HeatmapDrawer) -> None:
+    """Test invalid radius value raises ValueError"""
     with pytest.raises(ParameterError):
         heatmap_drawer.validate_heatmap_radius(-10.0)
 
 
 def test_validate_heatmap_radius_without_center_raises_exception(heatmap_drawer: HeatmapDrawer) -> None:
+    """Test radius without center raises ValueError"""
+    assert heatmap_drawer._center is None  # pylint: disable=protected-access
     with pytest.raises(ParameterError):
-        assert heatmap_drawer._center is None  # pylint: disable=protected-access
         heatmap_drawer.validate_heatmap_radius(10.0)
 
 
@@ -91,6 +102,7 @@ def test_validate_heatmap_radius_without_center_raises_exception(heatmap_drawer:
 def test_validate_heatmap_radius_with_valid_radius_returns_radius(
     valid_radius: float, expected_result: float, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test that valid radius returns radius"""
     heatmap_drawer.validate_heatmap_center("-10,10")
     assert expected_result == heatmap_drawer.validate_heatmap_radius(valid_radius)
 
@@ -105,6 +117,7 @@ def test_validate_heatmap_radius_with_valid_radius_returns_radius(
 def test_validate_heatmap_line_width_with_invalid_string_raises_exception(
     invalid_string: str, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test line width with invalid string raises ValueError"""
     with pytest.raises(ParameterError):
         heatmap_drawer.validate_heatmap_line_width(invalid_string)
 
@@ -120,6 +133,7 @@ def test_validate_heatmap_line_width_with_invalid_string_raises_exception(
 def test_validate_heatmap_line_width_with_invalid_value_raises_exception(
     invalid_string: str, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test line width with invalid value raises ValueError"""
     with pytest.raises(ParameterError):
         heatmap_drawer.validate_heatmap_line_width(invalid_string)
 
@@ -133,12 +147,14 @@ def test_validate_heatmap_line_width_with_invalid_value_raises_exception(
     ],
 )
 def test_validate_heatmap_line_width_with_valid_value_returns_line_widths(
-    valid_string: str, expected_result: Optional[List], heatmap_drawer: HeatmapDrawer
+    valid_string: str, expected_result: list | None, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test line width valid value returns line widths"""
     assert expected_result == heatmap_drawer.validate_heatmap_line_width(valid_string)
 
 
 def test_validate_heatmap_line_width_without_value_returns_none(heatmap_drawer: HeatmapDrawer) -> None:
+    """Test line width without value returns None"""
     assert heatmap_drawer.validate_heatmap_line_width() is None
 
 
@@ -151,8 +167,9 @@ def test_validate_heatmap_line_width_without_value_returns_none(heatmap_drawer: 
     ],
 )
 def test_get_line_transparencies_and_widths_with_values_returns_values(
-    valid_string: str, expected_result: Optional[List], heatmap_drawer: HeatmapDrawer
+    valid_string: str, expected_result: list | None, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test get line transparencies and widths returns values"""
     assert expected_result == heatmap_drawer.validate_heatmap_line_width(valid_string)
 
 
@@ -206,11 +223,13 @@ def test_get_line_transparencies_and_widths_with_values_returns_values(
 def test_get_line_transparencies_and_widths_with_automatic_returns_calculated_values(
     name: str, test_value1: tuple, test_value2: tuple, expected_result: list, heatmap_drawer: HeatmapDrawer
 ) -> None:
+    """Test get line transparencies and widths with automatic mode returns values"""
     bbox = s2sphere.sphere.LatLngRect.from_point_pair(
         s2sphere.LatLng.from_degrees(test_value1[0], test_value1[1]),
         s2sphere.LatLng.from_degrees(test_value2[0], test_value2[1]),
     )
-    print(name)
+    log = logging.getLogger("gpxtrackposter")
+    log.info(name)
     result = heatmap_drawer.get_line_transparencies_and_widths(bbox)
     for pair in [0, 2]:
         for value in [0, 1]:
@@ -218,6 +237,7 @@ def test_get_line_transparencies_and_widths_with_automatic_returns_calculated_va
 
 
 def test_parser_with_type_heatmap_sets_type(heatmap_drawer: HeatmapDrawer, parser: ArgumentParser) -> None:
+    """Test parser with type heatmap sets type"""
     heatmap_drawer.create_args(parser)
     parsed = parse_args(parser, ["--type", "heatmap"])
     assert parsed.type
@@ -225,12 +245,14 @@ def test_parser_with_type_heatmap_sets_type(heatmap_drawer: HeatmapDrawer, parse
 
 
 def test_parser_without_center_sets_none(heatmap_drawer: HeatmapDrawer, parser: ArgumentParser) -> None:
+    """Test parser without center sets None"""
     heatmap_drawer.create_args(parser)
     parsed = parser.parse_args([])
     assert parsed.heatmap_center is None
 
 
 def test_parser_with_center_sets_float_value(heatmap_drawer: HeatmapDrawer, parser: ArgumentParser) -> None:
+    """Test parser with center sets float value"""
     heatmap_drawer.create_args(parser)
     lat_lng = "47.99472, 7.84972"
     parsed = parser.parse_args(["--heatmap-center", lat_lng])
@@ -239,12 +261,14 @@ def test_parser_with_center_sets_float_value(heatmap_drawer: HeatmapDrawer, pars
 
 
 def test_parser_without_radius_sets_none(heatmap_drawer: HeatmapDrawer, parser: ArgumentParser) -> None:
+    """Test parser without radius sets None"""
     heatmap_drawer.create_args(parser)
     parsed = parser.parse_args([])
     assert parsed.heatmap_radius is None
 
 
 def test_parser_with_radius_sets_float_value(heatmap_drawer: HeatmapDrawer, parser: ArgumentParser) -> None:
+    """Test parser with radius sets float value"""
     heatmap_drawer.create_args(parser)
     parsed = parser.parse_args(["--heatmap-radius", "10.0"])
     assert parsed.heatmap_radius
@@ -265,6 +289,7 @@ def test_get_line_transparencies_and_widths_with_predefined_values_returns_prede
     heatmap_drawer: HeatmapDrawer,
     parser: ArgumentParser,
 ) -> None:
+    """Test get line transparencies and widths with predefined values returns values"""
     heatmap_drawer.create_args(parser)
     line_width = "0.2,4.0, 0.3,3.0, 1.0,1.0"
     expected_line_width = [(0.2, 4.0), (0.3, 3.0), (1.0, 1.0)]
@@ -280,7 +305,8 @@ def test_get_line_transparencies_and_widths_with_predefined_values_returns_prede
             line_width,
         ]
     )
-    print(name)
+    log = logging.getLogger("gpxtrackposter")
+    log.info(name)
     heatmap_drawer.fetch_args(parsed)
     assert parsed.heatmap_center
     assert parsed.heatmap_radius
@@ -303,6 +329,7 @@ def test_run_drawer(
     mock_track_instance_amsterdam_paris: MagicMock,
     mocker: MockerFixture,
 ) -> None:
+    """Test run drawer"""
     mocker.patch("svgwrite.Drawing.save", return_value=True)
 
     heatmap_drawer.create_args(parser)
@@ -335,6 +362,7 @@ def test_run_drawer_with_animation(
     mock_track_instance_amsterdam_paris: MagicMock,
     mocker: MockerFixture,
 ) -> None:
+    """Test run drawer with animation"""
     mocker.patch("svgwrite.Drawing.save", return_value=True)
 
     heatmap_drawer.create_args(parser)

@@ -1,0 +1,341 @@
+
+[build-system]
+requires = [
+    "setuptools",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gpxtrackposter"
+version = "0.1"
+description = "Setup GpxTrackPoster"
+readme = "README.md"
+license-files = ["LICENSE"]
+# Assume Python version >= 3.10
+requires-python = ">=3.10"
+dependencies = [
+    "appdirs",
+    "colour",
+    "geopy",
+    "gpxpy",
+    "pint",
+    "py-staticmaps",
+    "pytz",
+    "s2sphere",
+    "svgwrite",
+    "stravalib",
+    "polyline",
+    "timezonefinder"
+]
+
+[project.optional-dependencies]
+test = [
+    "autopep8",
+    "black",
+    "codespell",
+    "ruff",
+    "isort",
+    "mypy",
+    "pycodestyle",
+    "pyflakes",
+    "pylint",
+    "coverage",
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "mkdocs",
+    "mkdocstrings",
+    "mkdocstrings-python",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mkdocs-material",
+    "mkdocs-section-index",
+    "Pygments",
+    "python-dateutil",
+    "types-python-dateutil",
+    "types-pytz",
+    "types-setuptools"
+]
+
+[project.scripts]
+create_poster = "gpxtrackposter.cli:main"
+
+[tool.setuptools]
+packages = ["gpxtrackposter"]
+
+[tool.setuptools.data-files]
+"." = ["requirements.txt", "requirements-dev.txt"]
+"share/locale/de_DE/LC_MESSAGES" = ["locale/de_DE/LC_MESSAGES/gpxposter.mo"]
+"share/locale/fi_FI/LC_MESSAGES" = ["locale/fi_FI/LC_MESSAGES/gpxposter.mo"]
+"share/locale/fr_FR/LC_MESSAGES" = ["locale/fr_FR/LC_MESSAGES/gpxposter.mo"]
+"share/locale/ru_RU/LC_MESSAGES" = ["locale/ru_RU/LC_MESSAGES/gpxposter.mo"]
+"share/locale/zh_CN/LC_MESSAGES" = ["locale/zh_CN/LC_MESSAGES/gpxposter.mo"]
+#"share/locale/ar/LC_MESSAGES" = ["locale/ar/LC_MESSAGES/hatta.mo"]
+#"share/locale/cs/LC_MESSAGES" = ["locale/cs/LC_MESSAGES/hatta.mo"]
+#"share/locale/da/LC_MESSAGES" = ["locale/da/LC_MESSAGES/hatta.mo"]
+#"share/locale/de/LC_MESSAGES" = ["locale/de/LC_MESSAGES/hatta.mo"]
+#"share/locale/el/LC_MESSAGES" = ["locale/el/LC_MESSAGES/hatta.mo"]
+#"share/locale/es/LC_MESSAGES" = ["locale/es/LC_MESSAGES/hatta.mo"]
+#"share/locale/et/LC_MESSAGES" = ["locale/et/LC_MESSAGES/hatta.mo"]
+#"share/locale/fi/LC_MESSAGES" = ["locale/fi/LC_MESSAGES/hatta.mo"]
+#"share/locale/fr/LC_MESSAGES" = ["locale/fr/LC_MESSAGES/hatta.mo"]
+#"share/locale/hu/LC_MESSAGES" = ["locale/hu/LC_MESSAGES/hatta.mo"]
+#"share/locale/ja/LC_MESSAGES" = ["locale/ja/LC_MESSAGES/hatta.mo"]
+#"share/locale/lt/LC_MESSAGES" = ["locale/lt/LC_MESSAGES/hatta.mo"]
+#"share/locale/pl/LC_MESSAGES" = ["locale/pl/LC_MESSAGES/hatta.mo"]
+#"share/locale/ru/LC_MESSAGES" = ["locale/ru/LC_MESSAGES/hatta.mo"]
+#"share/locale/sv/LC_MESSAGES" = ["locale/sv/LC_MESSAGES/hatta.mo"]
+#"share/locale/vi/LC_MESSAGES" = ["locale/vi/LC_MESSAGES/hatta.mo"]
+#"share/doc/hatta/examples" = [
+#    "examples/hatta.fcgi",
+#    "examples/hatta.gzip.fcgi",
+#    "examples/hatta.wsgi",
+#    "examples/extend_parser.py"
+#]
+
+[tool.black]
+line-length = 120
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+target_version = ['py310']
+include = '\.py?$'
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".env",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pycache__",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "docs",
+]
+# Same as Black.
+line-length = 120
+indent-width = 4
+
+# Always generate Python 3.10-compatible code.
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "ALL",
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    "A",
+    "C",
+    "D",
+    "G",
+    "N",
+    "Q",
+    "S",
+    "T",
+    # pycodestyle warning
+    "W",
+]
+ignore = [
+    "C901",
+    "D202",
+    "D203",
+    "D211",
+    "D213",
+    "D400",
+    "D401",
+    "D403",
+    "D415",
+    "PLR",  # magic-value-comparison
+    "S101",  # assert
+#    "S603",  # subprocess-without-shell-equals-true
+#    "S607",  # start-process-with-partial-path
+#    "T201",  # print
+    "COM812",  # missing-trailing-comma
+    # to be removed
+    "FBT001",  # boolean-type-hint-positional-argument
+    "FBT002",  # boolean-default-value-positional-argument
+    "PTH",  # PATHLIB
+    "DTZ",  # DATETIMEZONE
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"gpxtrackposter/heatmap_drawer.py" = [
+    "FIX002",  # line-contains-todo
+    "PLC0415",  # import-outside-top-level
+    "TD",  # TODO
+]
+"gpxtrackposter/track.py" = [
+    "TRY301",  # raise-within-try
+]
+"gpxtrackposter/track_loader.py" = [
+    "BLE001",  # blind-except
+    "PERF203",  # try-except-in-loop
+]
+"docs/gen_ref_pages.py" = [
+    "ERA001",  # commented-out-code
+]
+"tests/**.py" = [
+    "FBT003",  # boolean-positional-value-in-call
+    "PLR0913",  # too-many-arguments
+    "PLR2004",  # magic-value-comparison
+    "PT006",  # pytest-parametrize-names-wrong-type
+    "PT011",  # pytest-raises-too-broad
+    "SLF001",  # private-member-access
+]
+"scripts/**.py" = [
+    "FIX",  # FIXME
+    "TD",  # TODO
+]
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+warn_unused_configs = true
+warn_no_return = true
+warn_unreachable = false
+enable_error_code = ["ignore-without-code"]
+
+[tool.pycodestyle]
+count = false
+statistics = true
+
+[tool.pylint.config]
+extension-pkg-whitelist = [
+    "numpy", "pandas", "keras", "tensorflow", "sklearn",
+    "matplotlib", "scipy"
+]
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "missing-docstring",
+    "too-many-positional-arguments",
+    "use-yield-from"
+]
+jobs = 1
+confidence = "HIGH"
+
+[tool.pylint.FORMAT]
+max-line-length = 120
+max-module-lines = 2000
+
+[tool.codespell]
+skip = "*.po,*.ts"
+count = ""
+quiet-level = 3
+
+[tool.pytest.ini_options]
+addopts = "-v -ra -s"
+pythonpath = ["./gpxtrackposter"]
+testpaths = ["./tests"]
+markers = [
+    "full_run: marks tests as full run (deselect with '-m \"not full_run\"')",
+    "debug: debugging tests"
+]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    "pragma: no cover",
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+    "if DEBUG_MODE",
+
+    # Don't complain if tests don't hit defensive assertion code:
+#    "raise AssertionError",
+#    "raise NotImplementedError",
+
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc\\.)?abstractmethod",
+]
+fail_under = 60
+ignore_errors = true
+
+[tool.coverage.paths]
+source = ["./gpxtrackposter/*"]
+
+[tool.coverage.html]
+directory = "reports"
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = ["gpxtrackposter/__init__.py"]
+
+[tool.isort]
+profile = "black"
+known_third_party = [
+    "numpy", "pandas", "keras", "tensorflow", "sklearn",
+    "matplotlib", "scipy", "gnspy"
+]

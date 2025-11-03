@@ -5,7 +5,6 @@ SRC_TEST = tests
 SRC_COMPLETE = $(SRC_CORE) $(SRC_TEST) $(SRC_SCRIPTS) docs/gen_ref_pages.py
 COPYRIGHT_FILES = $(SRC_CORE) $(SRC_TEST) $(SRC_SCRIPTS) README.md LICENSE
 PYTHON=python3
-PIP=$(PYTHON) -m pip
 
 help: ## Print help for each target
 	$(info Makefile low-level Python API.)
@@ -59,37 +58,39 @@ update-readme: ## update readme to output of 'gpxtrackposter --help'
 .PHONY: format
 format: ## Format the code
 	.env/bin/isort \
-		setup.py $(SRC_COMPLETE)
-	.env/bin/autopep8 \
+		$(SRC_COMPLETE)
+#	.env/bin/autopep8 \
 		-i -r \
-		setup.py $(SRC_COMPLETE)
-	.env/bin/black \
+		$(SRC_COMPLETE)
+#	.env/bin/black \
 		--line-length 120 \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
+	.env/bin/$(PYTHON) -m ruff format \
+		$(SRC_COMPLETE)
 
 .PHONY: lint
 lint: ## Lint the code
 	.env/bin/pycodestyle \
 	--max-line-length=120 \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/isort \
-		setup.py $(SRC_COMPLETE) \
+		$(SRC_COMPLETE) \
 		--check --diff
-	.env/bin/black \
+#	.env/bin/black \
 	    --line-length 120 \
 	    --check \
 	    --diff \
-	    setup.py $(SRC_COMPLETE)
+	    $(SRC_COMPLETE)
 	.env/bin/pyflakes \
-		setup.py $(SRC_COMPLETE)
-	.env/bin/flake8 \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/pylint \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
+	.env/bin/python -m ruff check \
+		$(SRC_COMPLETE)
 	.env/bin/mypy \
-		setup.py $(SRC_COMPLETE)
+		$(SRC_COMPLETE)
 	.env/bin/codespell \
-	    README.md setup.py gpxtrackposter/*.py tests/*.py scripts/*.py
+	    README.md gpxtrackposter/*.py tests/*.py scripts/*.py
 
 .PHONY: test
 test: ## Test the code
@@ -122,5 +123,4 @@ compile-messages: ## compile messages
 
 .PHONY: documentation
 documentation: ## Generate documentation
-	@if type mkdocs >/dev/null 2>&1 ; then .env/bin/python -m mkdocs build --clean --verbose ; \
-	 else echo "SKIPPED. Run '$(PIP) install mkdocs' first." >&2 ; fi 
+	.env/bin/python -m mkdocs build --clean --verbose 

@@ -1,6 +1,4 @@
-"""
-Several tests for utils
-"""
+"""Several tests for utils"""
 
 # Copyright 2018-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
@@ -10,7 +8,7 @@ Several tests for utils
 import math
 
 import pytest
-import s2sphere  # type: ignore
+import s2sphere  # type: ignore[import-untyped]
 
 from gpxtrackposter.utils import (
     compute_bounds_xy,
@@ -34,6 +32,7 @@ from gpxtrackposter.xy import XY
     ],
 )
 def test_latlng2xy(test_value: s2sphere.LatLng, expected_result: XY) -> None:
+    """Test latlng2xy"""
     assert math.isclose(expected_result.x, latlng2xy(test_value).x, rel_tol=0.000001)
     assert math.isclose(expected_result.y, latlng2xy(test_value).y, rel_tol=0.000001)
 
@@ -55,6 +54,7 @@ def test_latlng2xy(test_value: s2sphere.LatLng, expected_result: XY) -> None:
     ],
 )
 def test_lng2x(test_value: int, expected_result: float) -> None:
+    """Test lng2x"""
     assert math.isclose(expected_result, lng2x(test_value), rel_tol=0.000001)
 
 
@@ -69,6 +69,7 @@ def test_lng2x(test_value: int, expected_result: float) -> None:
     ],
 )
 def test_lat2y(test_value: int, expected_result: float) -> None:
+    """Test lat2y"""
     math.isclose(expected_result, lat2y(test_value), rel_tol=0.000001)
 
 
@@ -86,6 +87,7 @@ def test_lat2y(test_value: int, expected_result: float) -> None:
     ],
 )
 def test_compute_bounds_xy(test_value: list, expected_result: tuple) -> None:
+    """Test compute bounds xy"""
     bounds_xy = compute_bounds_xy(test_value)
     assert expected_result[0].lower() == bounds_xy[0].lower()
     assert expected_result[0].upper() == bounds_xy[0].upper()
@@ -105,6 +107,7 @@ def test_compute_bounds_xy(test_value: list, expected_result: tuple) -> None:
     ],
 )
 def test_compute_grid(count: int, dimensions: XY, expected_best_size: float, expected_best_counts: tuple) -> None:
+    """Test compute grid"""
     assert (expected_best_size, expected_best_counts) == compute_grid(count, dimensions)
 
 
@@ -119,6 +122,7 @@ def test_compute_grid(count: int, dimensions: XY, expected_best_size: float, exp
     ],
 )
 def test_interpolate_color(color1: str, color2: str, ratio: float, expected_color: str) -> None:
+    """Test interpolate color"""
     assert expected_color == interpolate_color(color1, color2, ratio)
 
 
@@ -131,6 +135,7 @@ def test_interpolate_color(color1: str, color2: str, ratio: float, expected_colo
     ],
 )
 def test_format_float(test_value: float, expected_result: str) -> None:
+    """Test format float"""
     assert expected_result == format_float(test_value)
     assert math.isclose(float(expected_result), float(format_float(test_value)), rel_tol=0.000001)
 
@@ -144,4 +149,5 @@ def test_format_float(test_value: float, expected_result: str) -> None:
     ],
 )
 def test_make_key_times(test_value: int, expected_result: list) -> None:
+    """Test make key times"""
     assert expected_result == make_key_times(test_value)

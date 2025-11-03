@@ -1,14 +1,11 @@
-"""
-Several tests for XY
-"""
+"""Several tests for XY"""
+
+from __future__ import annotations
 
 # Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
-
-from typing import Union
-
 import pytest
 
 from gpxtrackposter.xy import XY
@@ -26,7 +23,7 @@ from gpxtrackposter.xy import XY
         (XY(0.5, -5.0), (25.0, -500.0)),
     ],
 )
-def test_multiplication(other: Union[float, XY], expected: XY) -> None:
+def test_multiplication(other: float | XY, expected: XY) -> None:
     """Test multiplication"""
     test_object: XY = XY(50.0, 100.0)
     assert expected == (test_object * other).tuple()
@@ -44,7 +41,7 @@ def test_multiplication(other: Union[float, XY], expected: XY) -> None:
         (XY(0.5, -5.0), (25.0, -500.0)),
     ],
 )
-def test_right_multiplication(other: Union[float, XY], expected: XY) -> None:
+def test_right_multiplication(other: float | XY, expected: XY) -> None:
     """Test right multiplication"""
     test_object: XY = XY(50.0, 100.0)
     assert expected == (other * test_object).tuple()
@@ -62,7 +59,7 @@ def test_right_multiplication(other: Union[float, XY], expected: XY) -> None:
         (XY(0.5, -5.0), (100.0, -20.0)),
     ],
 )
-def test_division(other: Union[float, XY], expected: XY) -> None:
+def test_division(other: float | XY, expected: XY) -> None:
     """Test division"""
     test_object: XY = XY(50.0, 100.0)
     assert expected == (test_object / other).tuple()
@@ -80,7 +77,7 @@ def test_division(other: Union[float, XY], expected: XY) -> None:
         (XY(0.5, -5.0), (50.5, 95.0)),
     ],
 )
-def test_addition(other: Union[float, XY], expected: XY) -> None:
+def test_addition(other: float | XY, expected: XY) -> None:
     """Test addition"""
     test_object: XY = XY(50.0, 100.0)
     assert expected == (test_object + other).tuple()
@@ -98,7 +95,7 @@ def test_addition(other: Union[float, XY], expected: XY) -> None:
         (XY(0.5, -5.0), (50.5, 95.0)),
     ],
 )
-def test_right_addition(other: Union[float, XY], expected: XY) -> None:
+def test_right_addition(other: float | XY, expected: XY) -> None:
     """Test right addition"""
     test_object: XY = XY(50.0, 100.0)
     assert expected == (other + test_object).tuple()
@@ -116,7 +113,7 @@ def test_right_addition(other: Union[float, XY], expected: XY) -> None:
         (XY(0.5, -5.0), (49.5, 105.0)),
     ],
 )
-def test_subtraction(other: Union[float, XY], expected: XY) -> None:
+def test_subtraction(other: float | XY, expected: XY) -> None:
     """Test subtraction"""
     test_object: XY = XY(50.0, 100.0)
     assert expected == (test_object - other).tuple()
@@ -125,7 +122,7 @@ def test_subtraction(other: Union[float, XY], expected: XY) -> None:
 def test_representation() -> None:
     """Test representation"""
     test_object: XY = XY(50.0, 100.0)
-    assert "XY: 50.0/100.0" == str(test_object)
+    assert str(test_object) == "XY: 50.0/100.0"
 
 
 @pytest.mark.parametrize(
@@ -148,21 +145,21 @@ def test_equality_returns_true(this: XY, other: XY) -> None:
         (XY(10.54321, 10.12345), XY(10.543215, 10.123455)),
     ],
 )
-def test_equality_returns_false(this: XY, other: Union[float, XY]) -> None:
+def test_equality_returns_false(this: XY, other: float | XY) -> None:
     """Test equality"""
-    assert not this == other
+    assert this != other
 
 
 def test_tuple() -> None:
     """Test tuple"""
     test_object: XY = XY(50.0, 100.0)
-    assert (50.0, 100.0) == test_object.tuple()
+    assert test_object.tuple() == (50.0, 100.0)
 
 
 def test_to_int() -> None:
     """Test to_int"""
     test_object: XY = XY(50.12345, 100.98765)
-    assert (50, 100) == test_object.to_int().tuple()
+    assert test_object.to_int().tuple() == (50, 100)
 
 
 @pytest.mark.parametrize(
@@ -241,7 +238,7 @@ def test_scale_to_max_value_with_good_values(max_value: float, expected: XY) -> 
 def test_scale_to_max_value_with_bad_values(max_value: float, expected: XY) -> None:
     """Test scale_to_max_value"""
     test_object: XY = XY(50.0, 100.0)
-    assert not expected == test_object.scale_to_max_value(max_value).tuple()
+    assert expected != test_object.scale_to_max_value(max_value).tuple()
 
 
 @pytest.mark.parametrize(
@@ -270,4 +267,4 @@ def test_scale_to_max_value_with_x_gt_y_with_good_values(max_value: float, expec
 def test_scale_to_max_value_with_x_gt_y_with_bad_values(max_value: float, expected: XY) -> None:
     """Test scale_to_max_value_with_x_gt_y"""
     test_object: XY = XY(100.0, 50.0)
-    assert not expected == test_object.scale_to_max_value(max_value).tuple()
+    assert expected != test_object.scale_to_max_value(max_value).tuple()

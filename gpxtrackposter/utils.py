@@ -5,14 +5,18 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from __future__ import annotations
+
 import locale
 import math
 from itertools import count as itercount
 from itertools import takewhile
-from typing import List, Optional, Tuple
+from typing import TYPE_CHECKING
 
-import colour  # type: ignore
-import s2sphere  # type: ignore
+import colour  # type: ignore[import-untyped]
+
+if TYPE_CHECKING:
+    import s2sphere  # type: ignore[import-untyped]
 
 from gpxtrackposter.value_range import ValueRange
 from gpxtrackposter.xy import XY
@@ -27,6 +31,7 @@ def latlng2xy(latlng: s2sphere.LatLng) -> XY:
 
     Returns:
         XY: XY object from Latitude and Longitude.
+
     """
     return XY(lng2x(latlng.lng().degrees), lat2y(latlng.lat().degrees))
 
@@ -39,6 +44,7 @@ def lng2x(lng_deg: float) -> float:
 
     Returns:
         float: X value from Longitude.
+
     """
     return lng_deg / 180 + 1
 
@@ -51,13 +57,14 @@ def lat2y(lat_deg: float) -> float:
 
     Returns:
         float: Y value from Latitude.
+
     """
     return 0.5 - math.log(math.tan(math.pi / 4 * (1 + lat_deg / 90))) / math.pi
 
 
 def project(
-    bbox: s2sphere.LatLngRect, size: XY, offset: XY, latlnglines: List[List[s2sphere.LatLng]]
-) -> List[List[Tuple[float, float]]]:
+    bbox: s2sphere.LatLngRect, size: XY, offset: XY, latlnglines: list[list[s2sphere.LatLng]]
+) -> list[list[tuple[float, float]]]:
     """Project latitude, longitude lines to a boundary box with size and offset.
 
     Args:
@@ -67,7 +74,8 @@ def project(
         latlnglines: Latitude, longitude lines
 
     Returns:
-        List[List[Tuple[float, float]]]: List of tuples of x and y float values.
+        list[list[tuple[float, float]]]: List of tuples of x and y float values.
+
     """
     min_x = lng2x(bbox.lng_lo().degrees)
     d_x = lng2x(bbox.lng_hi().degrees) - min_x
@@ -87,23 +95,23 @@ def project(
         for latlng in latlngline:
             if bbox.contains(latlng):
                 line.append((offset + scale * latlng2xy(latlng)).tuple())
-            else:
-                if len(line) > 0:
-                    lines.append(line)
-                    line = []
+            elif len(line) > 0:
+                lines.append(line)
+                line = []
         if len(line) > 0:
             lines.append(line)
     return lines
 
 
-def compute_bounds_xy(lines: List[List[XY]]) -> Tuple[ValueRange, ValueRange]:
+def compute_bounds_xy(lines: list[list[XY]]) -> tuple[ValueRange, ValueRange]:
     """Compute boundaries of a list of XY objects.
 
     Args:
         lines: list of XY objects.
 
     Returns:
-        Tuple[ValueRange, ValueRange]: Tuple of boundary value ranges for x and y.
+        tuple[ValueRange, ValueRange]: Tuple of boundary value ranges for x and y.
+
     """
     range_x = ValueRange()
     range_y = ValueRange()
@@ -114,7 +122,7 @@ def compute_bounds_xy(lines: List[List[XY]]) -> Tuple[ValueRange, ValueRange]:
     return range_x, range_y
 
 
-def compute_grid(count: int, dimensions: XY) -> Tuple[Optional[float], Optional[Tuple[int, int]]]:
+def compute_grid(count: int, dimensions: XY) -> tuple[float | None, tuple[int, int] | None]:
     """Compute a grid with a given number of fields and dimensions.
 
     Args:
@@ -122,7 +130,8 @@ def compute_grid(count: int, dimensions: XY) -> Tuple[Optional[float], Optional[
         dimensions: Dimensions of grid.
 
     Returns:
-        Tuple[Optional[float], Optional[Tuple[int, int]]]: Tuple of best size and best counts for y and y.
+        tuple[Optional[float], Optional[tuple[int, int]]]: Tuple of best size and best counts for y and y.
+
     """
     # this is somehow suboptimal O(count^2). I guess it's possible in O(count)
     min_waste = -1.0
@@ -154,6 +163,7 @@ def interpolate_color(color1: str, color2: str, ratio: float) -> str:
 
     Returns:
         str: Interpolated color.
+
     """
     if ratio < 0:
         ratio = 0
@@ -177,18 +187,20 @@ def format_float(f: float) -> str:
 
     Returns:
         str: Formatted value.
+
     """
     return locale.format_string("%.1f", f)
 
 
-def make_key_times(year_count: int) -> List[str]:
-    """should append `1` because the svg keyTimes rule
+def make_key_times(year_count: int) -> list[str]:
+    """Should append `1` because the svg keyTimes rule
 
     Args:
         year_count: year run date count
 
     Returns:
-        typing.List[str]: list of key times points
+        typing.list[str]: list of key times points
+
     """
     s = list(takewhile(lambda n: n < 1, itercount(0, 1 / year_count)))
     s.append(1)

@@ -1,6 +1,4 @@
-"""
-Several tests for CircularDrawer
-"""
+"""Several tests for CircularDrawer"""
 
 # Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
@@ -11,7 +9,7 @@ from argparse import ArgumentParser
 from unittest.mock import MagicMock
 
 import pytest
-from pint import Quantity  # type: ignore
+from pint import Quantity  # type: ignore[import-untyped]
 from pytest_mock import MockerFixture
 
 from gpxtrackposter.circular_drawer import CircularDrawer
@@ -22,6 +20,7 @@ from gpxtrackposter.units import Units
 
 
 def test_parser_with_type_circular_sets_type(circular_drawer: CircularDrawer, parser: ArgumentParser) -> None:
+    """Test parser with type circular sets type"""
     circular_drawer.create_args(parser)
     parsed = parse_args(parser, ["--type", "circular"])
     assert parsed.type
@@ -29,18 +28,21 @@ def test_parser_with_type_circular_sets_type(circular_drawer: CircularDrawer, pa
 
 
 def test_parser_without_rings_sets_false(circular_drawer: CircularDrawer, parser: ArgumentParser) -> None:
+    """TEst parser without rings sets False"""
     circular_drawer.create_args(parser)
     parsed = parser.parse_args(["--type", "circular"])
     assert not parsed.circular_rings
 
 
 def test_parser_with_rings_sets_true(circular_drawer: CircularDrawer, parser: ArgumentParser) -> None:
+    """Test parser with rings sets True"""
     circular_drawer.create_args(parser)
     parsed = parser.parse_args(["--circular-rings"])
     assert parsed.circular_rings
 
 
 def test_parser_without_color_sets_color_darkgrey(circular_drawer: CircularDrawer, parser: ArgumentParser) -> None:
+    """Test parser without color sets color darkgrey"""
     circular_drawer.create_args(parser)
     parsed = parser.parse_args(["--type", "circular"])
     circular_drawer.fetch_args(parsed)
@@ -49,6 +51,7 @@ def test_parser_without_color_sets_color_darkgrey(circular_drawer: CircularDrawe
 
 
 def test_parser_with_color_sets_value(circular_drawer: CircularDrawer, parser: ArgumentParser) -> None:
+    """Test parser with color sets value"""
     circular_drawer.create_args(parser)
     parsed = parser.parse_args(["--circular-ring-color", "red"])
     circular_drawer.fetch_args(parsed)
@@ -57,6 +60,7 @@ def test_parser_with_color_sets_value(circular_drawer: CircularDrawer, parser: A
 
 
 def test_parser_without_distance_keeps_none(circular_drawer: CircularDrawer, parser: ArgumentParser) -> None:
+    """Test parser without distance keeps None"""
     circular_drawer.create_args(parser)
     parsed = parser.parse_args(["--type", "circular"])
     circular_drawer.fetch_args(parsed)
@@ -80,6 +84,7 @@ def test_parser_without_distance_keeps_none(circular_drawer: CircularDrawer, par
 def test_parser_with_distance_sets_quantity_value(
     units: str, value: float, expected_value: Quantity, circular_drawer: CircularDrawer, parser: ArgumentParser
 ) -> None:
+    """Test parser with distance sets quantity value"""
     circular_drawer.create_args(parser)
     parsed = parser.parse_args(["--circular-ring-max-distance", str(value), "--unit", units])
     circular_drawer.fetch_args(parsed)
@@ -112,6 +117,7 @@ def test_parser_with_distance_sets_quantity_value(
 def test_determine_ring_distance(
     units: str, value: Quantity, expected_value: Quantity, circular_drawer: CircularDrawer, parser: ArgumentParser
 ) -> None:
+    """Test determine ring distance"""
     circular_drawer.poster.units = units
     circular_drawer.create_args(parser)
     circular_drawer.fetch_args(parser.parse_args([]))
@@ -127,6 +133,7 @@ def test_run_drawer(
     mock_track_instance_amsterdam_paris: MagicMock,
     mocker: MockerFixture,
 ) -> None:
+    """Test run drawer"""
     mocker.patch("svgwrite.Drawing.save", return_value=True)
 
     circular_drawer.create_args(parser)
@@ -159,6 +166,7 @@ def test_run_drawer_with_animation(
     mock_track_instance_amsterdam_paris: MagicMock,
     mocker: MockerFixture,
 ) -> None:
+    """Test run drawer with animation"""
     mocker.patch("svgwrite.Drawing.save", return_value=True)
 
     circular_drawer.create_args(parser)

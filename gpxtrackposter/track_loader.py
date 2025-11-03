@@ -5,6 +5,8 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from __future__ import annotations
+
 import concurrent.futures
 import datetime
 import hashlib
@@ -12,11 +14,10 @@ import json
 import logging
 import os
 import shutil
-from typing import Any, Dict, Generator, List, Optional
+from typing import TYPE_CHECKING, Any
 
-import pint  # type: ignore
-import s2sphere  # type: ignore
-from stravalib import Client  # type: ignore
+import s2sphere  # type: ignore[import-untyped]
+from stravalib import Client  # type: ignore[import-untyped]
 
 from gpxtrackposter.exceptions import ParameterError, TrackLoadError
 from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
@@ -24,7 +25,12 @@ from gpxtrackposter.track import Track
 from gpxtrackposter.units import Units
 from gpxtrackposter.year_range import YearRange
 
-log = logging.getLogger(__name__)
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    import pint  # type: ignore[import-untyped]
+
+log = logging.getLogger("gpxtrackposter")
 
 
 def load_gpx_file(file_name: str, timezone_adjuster: TimezoneAdjuster) -> Track:
@@ -36,6 +42,7 @@ def load_gpx_file(file_name: str, timezone_adjuster: TimezoneAdjuster) -> Track:
 
     Returns:
         Track: Generated track object from gpx file.
+
     """
     log.info("Loading track %s...", os.path.basename(file_name))
     t = Track()
@@ -55,15 +62,17 @@ def load_cached_track_file(cache_file_name: str, file_name: str) -> Track:
 
     Raises:
         TrackLoadError: Track could not be loaded from cache.
+
     """
     try:
         t = Track()
         t.load_cache(cache_file_name)
         t.file_names = [os.path.basename(file_name)]
-        log.info("Loaded track %s from cache file %s", file_name, cache_file_name)
-        return t
     except Exception as e:
-        raise TrackLoadError("Failed to load track from cache.") from e
+        msg = "Failed to load track from cache."
+        raise TrackLoadError(msg) from e
+    log.info("Loaded track %s from cache file %s", file_name, cache_file_name)
+    return t
 
 
 class TrackLoader:
@@ -79,16 +88,18 @@ class TrackLoader:
     Methods:
         clear_cache: Remove cache directory
         load_tracks: Load all data from cache and GPX files
+
     """
 
-    def __init__(self, workers: Optional[int]) -> None:
-        self._workers: Optional[int] = workers
+    def __init__(self, workers: int | None) -> None:
+        """Initialize the TrackLoader class."""
+        self._workers: int | None = workers
         self._min_length: pint.Quantity = 1 * Units().km
-        self.special_file_names: List[str] = []
+        self.special_file_names: list[str] = []
         self.year_range: YearRange = YearRange()
-        self.cache_dir: Optional[str] = None
+        self.cache_dir: str | None = None
         self.strava_cache_file: str = ""
-        self._cache_file_names: Dict[str, str] = {}
+        self._cache_file_names: dict[str, str] = {}
         self._activity_type: str = "all"
 
     def set_cache_dir(self, cache_dir: str) -> None:
@@ -96,6 +107,7 @@ class TrackLoader:
 
         Args:
             cache_dir: The path to the cache directory.
+
         """
         self.cache_dir = cache_dir
 
@@ -104,19 +116,21 @@ class TrackLoader:
 
         Raises:
             OSError: If directory could not be removed.
+
         """
         if self.cache_dir is not None and os.path.isdir(self.cache_dir):
             log.info("Removing cache dir: %s", self.cache_dir)
             try:
                 shutil.rmtree(self.cache_dir)
-            except OSError as e:
-                log.error("Failed: %s", str(e))
+            except OSError:
+                log.exception("Failed")
 
     def set_min_length(self, min_length: pint.Quantity) -> None:
         """Set the minimum length.
 
         Args:
             min_length: Minimum length.
+
         """
         self._min_length = min_length
 
@@ -125,25 +139,27 @@ class TrackLoader:
 
         Args:
             activity_type: Activity type.
+
         """
         self._activity_type = activity_type.lower()
 
-    def load_tracks(self, base_dir: str) -> List[Track]:
+    def load_tracks(self, base_dir: str) -> list[Track]:
         """Load tracks base_dir and return as a List of tracks.
 
         Args:
             base_dir: Base directory with gpx files.
 
         Returns:
-            List[Track]: A List of tracks.
+            list[Track]: A List of tracks.
+
         """
         file_names = list(self._list_gpx_files(base_dir))
         log.info("GPX files: %d", len(file_names))
 
-        tracks: List[Track] = []
+        tracks: list[Track] = []
 
         # load track from cache
-        cached_tracks: Dict[str, Track] = {}
+        cached_tracks: dict[str, Track] = {}
         if self.cache_dir:
             log.info("Trying to load %d track(s) from cache...", len(file_names))
             cached_tracks = self._load_tracks_from_cache(file_names)
@@ -162,14 +178,15 @@ class TrackLoader:
 
         return self._filter_and_merge_tracks(tracks)
 
-    def load_strava_tracks(self, strava_config: str) -> List[Track]:
-        """
+    def load_strava_tracks(self, strava_config: str) -> list[Track]:
+        """Load strava tracks
 
         Args:
             strava_config: Strava config file
 
         Returns:
-            List[Track]: A List of tracks.
+            list[Track]: A List of tracks.
+
         """
         tracks = []
         tracks_names = []
@@ -191,13 +208,16 @@ class TrackLoader:
         if tracks:
             max_time = max(track.start_time() for track in tracks)
             filter_dict = {"after": max_time - datetime.timedelta(days=2)}
-        for activity in client.get_activities(**filter_dict):  # type: ignore
+        for activity in client.get_activities(**filter_dict):  # type: ignore[arg-type]
             # tricky to pass the timezone
             if str(activity.id) in tracks_names:
                 continue
-            if filter_type and activity.type not in (
-                [filter_type] if isinstance(filter_type, str) else filter_type
-            ):  # pylint: disable=superfluous-parens
+            # pylint: disable=superfluous-parens
+            if (
+                filter_type
+                and activity.type
+                and activity.type.root not in ([filter_type] if isinstance(filter_type, str) else filter_type)
+            ):
                 continue
             t = Track()
             t.load_strava(activity)
@@ -205,7 +225,7 @@ class TrackLoader:
         self._store_strava_tracks_to_cache(tracks)
         return self._filter_and_merge_tracks(tracks)
 
-    def _filter_tracks(self, tracks: List[Track]) -> List[Track]:
+    def _filter_tracks(self, tracks: list[Track]) -> list[Track]:
         filtered_tracks = []
         for t in tracks:
             file_name = t.file_names[0]
@@ -220,18 +240,18 @@ class TrackLoader:
                 filtered_tracks.append(t)
         return filtered_tracks
 
-    def _filter_and_merge_tracks(self, tracks: List[Track]) -> List[Track]:
+    def _filter_and_merge_tracks(self, tracks: list[Track]) -> list[Track]:
         tracks = self._filter_tracks(tracks)
         # merge tracks that took place within one hour
         tracks = self._merge_tracks(tracks)
         # filter out tracks with length < min_length
         tracks = [t for t in tracks if t.length() >= self._min_length]
         # filter out tracks with wrong activity type
-        tracks = [t for t in tracks if self._activity_type in (t.activity_type, "all")]
-        return tracks
+        return [t for t in tracks if self._activity_type in (t.activity_type, "all")]
 
     @staticmethod
-    def _merge_tracks(tracks: List[Track]) -> List[Track]:
+    def _merge_tracks(tracks: list[Track]) -> list[Track]:
+        one_hour_seconds = 3600
         log.info("Merging tracks...")
         tracks = sorted(tracks, key=lambda t1: t1.start_time())
         merged_tracks = []
@@ -241,7 +261,7 @@ class TrackLoader:
                 merged_tracks.append(t)
             else:
                 dt = int((t.start_time() - last_end_time).total_seconds())
-                if 0 < dt < 3600:
+                if 0 < dt < one_hour_seconds:
                     merged_tracks[-1].append(t)
                 else:
                     merged_tracks.append(t)
@@ -249,15 +269,16 @@ class TrackLoader:
         log.info("Merged %d track(s)", len(tracks) - len(merged_tracks))
         return merged_tracks
 
-    def _load_tracks(self, file_names: List[str], timezone_adjuster: TimezoneAdjuster) -> Dict[str, Track]:
+    def _load_tracks(self, file_names: list[str], timezone_adjuster: TimezoneAdjuster) -> dict[str, Track]:
         tracks = {}
 
         if self._workers is not None and self._workers <= 1:
             for file_name in file_names:
                 try:
                     t = load_gpx_file(file_name, timezone_adjuster)
-                except TrackLoadError as e:
-                    log.error("Error while loading %s: %s", file_name, str(e))
+                except TrackLoadError:
+                    msg = f"Error while loading {file_name}"
+                    log.exception(msg)
                 else:
                     tracks[file_name] = t
             return tracks
@@ -270,23 +291,23 @@ class TrackLoader:
             file_name = future_to_file_name[future]
             try:
                 t = future.result()
-            except TrackLoadError as e:
-                log.error("Error while loading %s: %s", file_name, str(e))
+            except TrackLoadError:
+                msg = f"Error while loading {file_name}"
+                log.exception(msg)
             else:
                 tracks[file_name] = t
 
         return tracks
 
-    def _load_tracks_from_cache(self, file_names: List[str]) -> Dict[str, Track]:
+    def _load_tracks_from_cache(self, file_names: list[str]) -> dict[str, Track]:
         tracks = {}
 
         if self._workers is not None and self._workers <= 1:
             for file_name in file_names:
                 try:
                     t = load_cached_track_file(self._get_cache_file_name(file_name), file_name)
-                except Exception:
-                    # silently ignore failed cache load attempts
-                    pass
+                except TrackLoadError:
+                    log.info("Silently ignore failed cache load attempts.")
                 else:
                     tracks[file_name] = t
             return tracks
@@ -301,27 +322,30 @@ class TrackLoader:
             try:
                 t = future.result()
             except Exception:
-                # silently ignore failed cache load attempts
-                pass
+                log.info("Silently ignore failed cache load attempts.")
             else:
                 tracks[file_name] = t
 
         return tracks
 
-    def _store_tracks_to_cache(self, tracks: Dict[str, Track]) -> None:
+    def _store_track_to_cache(self, file_name: str, track: Track) -> None:
+        try:
+            track.store_cache(self._get_cache_file_name(file_name))
+        except Exception:
+            msg = f"Failed to store track %s to cache: {file_name}"
+            log.exception(msg)
+        else:
+            msg = f"Stored track {file_name} to cache"
+            log.info(msg)
+
+    def _store_tracks_to_cache(self, tracks: dict[str, Track]) -> None:
         if (not tracks) or (not self.cache_dir):
             return
-
         log.info("Storing %d track(s) to cache...", len(tracks))
         for file_name, t in tracks.items():
-            try:
-                t.store_cache(self._get_cache_file_name(file_name))
-            except Exception as e:
-                log.error("Failed to store track %s to cache: %s", file_name, str(e))
-            else:
-                log.info("Stored track %s to cache", file_name)
+            self._store_track_to_cache(file_name, t)
 
-    def _store_strava_tracks_to_cache(self, tracks: List[Track]) -> None:
+    def _store_strava_tracks_to_cache(self, tracks: list[Track]) -> None:
         if (not tracks) or (not self.cache_dir):
             return
         dirname = os.path.dirname(self.strava_cache_file)
@@ -333,10 +357,10 @@ class TrackLoader:
             json.dump(to_cache_tracks, f)
 
     @staticmethod
-    def _make_strava_cache_dict(track: Track) -> Dict[str, Any]:
-        lines_data = []
-        for line in track.polylines:
-            lines_data.append([{"lat": latlng.lat().degrees, "lng": latlng.lng().degrees} for latlng in line])
+    def _make_strava_cache_dict(track: Track) -> dict[str, Any]:
+        lines_data = [
+            {"lat": latlng.lat().degrees, "lng": latlng.lng().degrees} for line in track.polylines for latlng in line
+        ]
         return {
             "name": track.file_names[0],  # strava id
             "start": track.start_time().strftime("%Y-%m-%d %H:%M:%S"),
@@ -346,7 +370,7 @@ class TrackLoader:
         }
 
     @staticmethod
-    def _strava_cache_to_track(data: Dict[str, Any]) -> "Track":
+    def _strava_cache_to_track(data: dict[str, Any]) -> Track:
         t = Track()
         t.file_names = [data["name"]]
         t.set_start_time(datetime.datetime.strptime(data["start"], "%Y-%m-%d %H:%M:%S"))
@@ -361,7 +385,8 @@ class TrackLoader:
     def _list_gpx_files(base_dir: str) -> Generator[str, None, None]:
         base_dir = os.path.abspath(base_dir)
         if not os.path.isdir(base_dir):
-            raise ParameterError(f"Not a directory: {base_dir}")
+            msg = f"Not a directory: {base_dir}"
+            raise ParameterError(msg)
         for name in os.listdir(base_dir):
             path_name = os.path.join(base_dir, name)
             if name.endswith(".gpx") and os.path.isfile(path_name):
@@ -377,9 +402,11 @@ class TrackLoader:
             with open(file_name, "rb") as file:
                 checksum = hashlib.sha256(file.read()).hexdigest()
         except PermissionError as e:
-            raise TrackLoadError("Failed to compute checksum (bad permissions).") from e
+            msg = "Failed to compute checksum (bad permissions)."
+            raise TrackLoadError(msg) from e
         except Exception as e:
-            raise TrackLoadError("Failed to compute checksum.") from e
+            msg = "Failed to compute checksum."
+            raise TrackLoadError(msg) from e
 
         cache_file_name = os.path.join(self.cache_dir, f"{checksum}.json")
         self._cache_file_names[file_name] = cache_file_name

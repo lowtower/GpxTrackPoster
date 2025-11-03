@@ -5,29 +5,34 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+from __future__ import annotations
+
 import gettext
 import locale
 import logging
 from collections import defaultdict
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any
 
-import pint  # type: ignore
-import svgwrite  # type: ignore
+import pint  # type: ignore[import-untyped]
+import svgwrite  # type: ignore[import-untyped]
 
 from gpxtrackposter.quantity_range import QuantityRange
-from gpxtrackposter.track import Track
 from gpxtrackposter.units import Units
 from gpxtrackposter.utils import format_float
 from gpxtrackposter.xy import XY
 from gpxtrackposter.year_range import YearRange
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gpxtrackposter.track import Track
+
     # avoid circlic import
     from gpxtrackposter.tracks_drawer import (
         TracksDrawer,  # pylint: disable=cyclic-import
     )
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("gpxtrackposter")
 
 
 class Poster:
@@ -56,41 +61,44 @@ class Poster:
         draw: Draw the tracks on the poster.
         m2u: Convert meters to kilometers or miles based on units.
         u: Return distance unit (km or mi).
+
     """
 
     def __init__(self) -> None:
-        self._athlete: Optional[str] = None
-        self._title: Optional[str] = None
-        self.tracks_by_date: Dict[str, List[Track]] = defaultdict(list)
-        self.year_tracks_date_count_dict: Dict[int, int] = defaultdict(int)
-        self.tracks: List[Track] = []
+        """Initialize the Poster class."""
+        self._athlete: str | None = None
+        self._title: str | None = None
+        self.tracks_by_date: dict[str, list[Track]] = defaultdict(list)
+        self.year_tracks_date_count_dict: dict[int, int] = defaultdict(int)
+        self.tracks: list[Track] = []
         self.length_range: QuantityRange = QuantityRange()
         self.length_range_by_date: QuantityRange = QuantityRange()
-        self.total_length_year_dict: Dict[int, pint.Quantity] = defaultdict(int)  # type: ignore
+        self.total_length_year_dict: dict[int, pint.Quantity] = defaultdict(int)  # type: ignore[arg-type]
         self.units: str = "metric"
-        self.colors: Dict = {
+        self.colors: dict = {
             "background": "#222222",
             "text": "#FFFFFF",
             "special": "#FFFF00",
             "track": "#4DD2FF",
         }
-        self.special_distance: Dict[str, float] = {"special_distance1": 10, "special_distance2": 20}
+        self.special_distance: dict[str, float] = {"special_distance1": 10, "special_distance2": 20}
         self.width: int = 200
         self.height: int = 300
-        self.padding: Dict[str, int] = {"l": 10, "t": 30, "r": 10, "b": 30}
+        self.padding: dict[str, int] = {"l": 10, "t": 30, "r": 10, "b": 30}
         self.years: YearRange = YearRange()
-        self.tracks_drawer: Optional["TracksDrawer"] = None
-        self._trans: Optional[Callable[[str], str]] = None
+        self.tracks_drawer: TracksDrawer | None = None
+        self._trans: Callable[[str], str] | None = None
         self.with_animation: bool = False
         self.animation_time: int = 30
         self.set_language(None, None)
 
-    def set_language(self, language: Optional[str], localedir: Optional[str]) -> None:
-        """
+    def set_language(self, language: str | None, localedir: str | None) -> None:
+        """Set language
 
         Args:
             language: language for the poster
             localedir: directory for locale files
+
         """
         if language:
             try:
@@ -120,6 +128,7 @@ class Poster:
 
         Returns:
             str: translated string.
+
         """
         if self._trans is None:
             return s
@@ -133,6 +142,7 @@ class Poster:
 
         Returns:
             str: month name.
+
         """
         assert 1 <= month <= 12
 
@@ -156,6 +166,7 @@ class Poster:
 
         Args:
             athlete: Name of athlete for the poster.
+
         """
         self._athlete = athlete
 
@@ -164,6 +175,7 @@ class Poster:
 
         Args:
             title: Title for the poster.
+
         """
         self._title = title
 
@@ -172,6 +184,7 @@ class Poster:
 
         Args:
             with_animation: With animation or not.
+
         """
         self.with_animation = with_animation
 
@@ -180,10 +193,11 @@ class Poster:
 
         Args:
             animation_time: The animation time.
+
         """
         self.animation_time = animation_time
 
-    def set_tracks(self, tracks: List[Track]) -> None:
+    def set_tracks(self, tracks: list[Track]) -> None:
         """Associate the set of tracks with this poster.
 
         In addition to setting self.tracks, also compute the necessary attributes for the Poster
@@ -191,6 +205,7 @@ class Poster:
 
         Args:
             tracks: A list of tracks for the poster.
+
         """
         self.tracks = tracks
         self.tracks_by_date.clear()
@@ -211,12 +226,13 @@ class Poster:
             length = pint.Quantity(sum(t.length() for t in date_tracks))
             self.length_range_by_date.extend(length)
 
-    def draw(self, drawer: "TracksDrawer", output: str) -> None:
+    def draw(self, drawer: TracksDrawer, output: str) -> None:
         """Set the Poster's drawer and draw the tracks.
 
         Args:
             drawer: The drawer type of the poster.
             output: The output name of the poster.
+
         """
         self.tracks_drawer = drawer
         d = svgwrite.Drawing(output, (f"{self.width}mm", f"{self.height}mm"))
@@ -240,6 +256,7 @@ class Poster:
 
         Returns:
             float: converted value.
+
         """
         if self.units == "metric":
             return m.m_as(Units().km)
@@ -250,6 +267,7 @@ class Poster:
 
         Returns:
             str: The unit of distance being used on the Poster.
+
         """
         if self.units == "metric":
             return self.translate("km")
@@ -263,6 +281,7 @@ class Poster:
 
         Returns:
             str: Formatted distance.
+
         """
         return format_float(self.m2u(d)) + " " + self.u()
 
@@ -391,14 +410,14 @@ class Poster:
 
     def _compute_track_statistics(
         self,
-    ) -> Tuple[pint.Quantity, pint.Quantity, QuantityRange, int]:
+    ) -> tuple[pint.Quantity, pint.Quantity, QuantityRange, int]:
         length_range = QuantityRange()
-        total_length = 0.0 * Units().meter
+        total_length: Any = 0.0 * Units().meter
         self.total_length_year_dict.clear()
         weeks = {}
         for t in self.tracks:
             total_length += t.length()
-            self.total_length_year_dict[t.start_time().year] += t.length()  # type: ignore
+            self.total_length_year_dict[t.start_time().year] += t.length()  # type: ignore[misc]
             length_range.extend(t.length())
             # time.isocalendar()[1] -> week number
             weeks[(t.start_time().year, t.start_time().isocalendar()[1])] = 1
@@ -410,7 +429,7 @@ class Poster:
             len(weeks),
         )
 
-    def _compute_years(self, tracks: List[Track]) -> None:
+    def _compute_years(self, tracks: list[Track]) -> None:
         self.years.clear()
         for t in tracks:
             self.years.add(t.start_time())

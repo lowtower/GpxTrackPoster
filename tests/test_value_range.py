@@ -1,6 +1,4 @@
-"""
-Several tests for ValueRange
-"""
+"""Several tests for ValueRange"""
 
 # Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
@@ -97,7 +95,7 @@ def test_diameter_on_invalid_returns_zero() -> None:
     """diameter on invalid instance returns 0"""
     value_range = ValueRange()
     assert not value_range.is_valid()
-    assert 0.0 == value_range.diameter()
+    assert value_range.diameter() == 0.0
 
 
 @pytest.mark.parametrize(

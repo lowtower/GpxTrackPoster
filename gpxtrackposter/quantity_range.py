@@ -5,9 +5,9 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-from typing import Optional
+from __future__ import annotations
 
-import pint  # type: ignore
+import pint  # type: ignore[import-untyped]
 
 
 class QuantityRange:
@@ -27,14 +27,16 @@ class QuantityRange:
         extend: Adjust the range to include Quantity value.
         interpolate: Return interpolated Quantity value
         relative_position: Return relative position of value with respect to lower and upper of QuantityRange
+
     """
 
     def __init__(self) -> None:
-        self._lower: Optional[pint.Quantity] = None
-        self._upper: Optional[pint.Quantity] = None
+        """Initialize the QuantityRange class."""
+        self._lower: pint.Quantity | None = None
+        self._upper: pint.Quantity | None = None
 
     @classmethod
-    def from_pair(cls, value1: pint.Quantity, value2: pint.Quantity) -> "QuantityRange":
+    def from_pair(cls, value1: pint.Quantity, value2: pint.Quantity) -> QuantityRange:
         """Create a quantity range from a pair of values.
 
         Args:
@@ -43,6 +45,7 @@ class QuantityRange:
 
         Returns:
             QuantityRange: Created quantity range
+
         """
         r = cls()
         r.extend(value1)
@@ -59,22 +62,25 @@ class QuantityRange:
 
         Returns:
             bool: Is the quantity range valid or not.
+
         """
         return self._lower is not None
 
-    def lower(self) -> Optional[pint.Quantity]:
+    def lower(self) -> pint.Quantity | None:
         """Returns the lower value of the quantity range.
 
         Returns:
-            Optional[pint.Quantity]: The lower value of the quantity range.
+            pint.Quantity | None: The lower value of the quantity range.
+
         """
         return self._lower
 
-    def upper(self) -> Optional[pint.Quantity]:
+    def upper(self) -> pint.Quantity | None:
         """Returns the upper value of the quantity range.
 
         Returns:
-            Optional[pint.Quantity]: The upper value of the quantity range.
+            pint.Quantity | None: The upper value of the quantity range.
+
         """
         return self._upper
 
@@ -82,7 +88,8 @@ class QuantityRange:
         """Returns the diameter value of the quantity range.
 
         Returns:
-            Optional[pint.Quantity]: The diameter value of the quantity range.
+            pint.Quantity | None: The diameter value of the quantity range.
+
         """
         if self.is_valid():
             assert self._upper is not None
@@ -98,6 +105,7 @@ class QuantityRange:
 
         Returns:
             bool: Quantity range contains the value or not.
+
         """
         if not self.is_valid():
             return False
@@ -111,6 +119,7 @@ class QuantityRange:
 
         Args:
             value: Value to extend the quantity range with.
+
         """
         if not self.is_valid():
             self._lower = value
@@ -132,9 +141,11 @@ class QuantityRange:
 
         Raises:
             ValueError: Quantity range cannot be interpolated.
+
         """
         if not self.is_valid():
-            raise ValueError("Cannot interpolate invalid QuantityRange")
+            msg = "Cannot interpolate invalid QuantityRange"
+            raise ValueError(msg)
         assert self._lower is not None
         assert self._upper is not None
         return self._lower + relative * (self._upper - self._lower)
@@ -150,9 +161,11 @@ class QuantityRange:
 
         Raises:
             ValueError: Relative position cannot be evaluated from the quantity range.
+
         """
         if not self.is_valid():
-            raise ValueError("Cannot get relative_position for invalid QuantityRange")
+            msg = "Cannot get relative_position for invalid QuantityRange"
+            raise ValueError(msg)
         assert self._lower is not None
         assert self._upper is not None
         if value <= self._lower:

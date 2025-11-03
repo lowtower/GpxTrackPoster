@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Update README"""
+
 # Copyright 2018-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -7,31 +9,39 @@
 
 import sys
 
-usage = sys.stdin.read()
-if not usage.startswith("usage: create_poster"):
-    raise RuntimeError("Bad usage info from stdin")
 
-readme_md_file_name = sys.argv[1]
-if not readme_md_file_name.endswith("README.md"):
-    raise RuntimeError(f"Bad README.md file: {readme_md_file_name}")
+def main() -> None:
+    """Update README main function"""
+    usage = sys.stdin.read()
+    if not usage.startswith("usage: create_poster"):
+        msg = "Bad usage info from stdin"
+        raise RuntimeError(msg)
 
-# replace usage in README.md
-with open(readme_md_file_name, "r", encoding="utf8") as f:
-    lines = f.readlines()
+    readme_md_file_name = sys.argv[1]
+    if not readme_md_file_name.endswith("README.md"):
+        msg = f"Bad README.md file: {readme_md_file_name}"
+        raise RuntimeError(msg)
 
-# TODO: remove invalid-name if python3.9 is dropped
-with open(readme_md_file_name, "w", encoding="utf8") as f:
-    state = 0  # pylint: disable=invalid-name
-    for line in lines:
-        if state == 0:  # pylint: disable=invalid-name
-            if line.startswith("usage: create_poster"):
-                f.write(usage)
-                state = 1  # pylint: disable=invalid-name
+    # replace usage in README.md
+    with open(readme_md_file_name, encoding="utf8") as f:
+        lines = f.readlines()
+
+    with open(readme_md_file_name, "w", encoding="utf8") as f:
+        state = 0
+        for line in lines:
+            if state == 0:
+                if line.startswith("usage: create_poster"):
+                    f.write(usage)
+                    state = 1
+                else:
+                    f.write(line)
+            elif state == 1:
+                if line.startswith("```"):
+                    f.write(line)
+                    state = 2
             else:
                 f.write(line)
-        elif state == 1:  # pylint: disable=invalid-name
-            if line.startswith("```"):
-                f.write(line)
-                state = 2  # pylint: disable=invalid-name
-        else:
-            f.write(line)
+
+
+if __name__ == "__main__":
+    main()

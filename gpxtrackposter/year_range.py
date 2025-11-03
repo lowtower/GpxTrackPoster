@@ -5,9 +5,14 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import datetime
+from __future__ import annotations
+
 import re
-from typing import Generator, Optional
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import datetime
+    from collections.abc import Generator
 
 
 class YearRange:
@@ -22,15 +27,21 @@ class YearRange:
         add: Adjust bounds based on a track
         contains: If track is contained in the range
         count: Number of years in range
+
     """
 
     def __init__(self) -> None:
         """Initialises a YearRange with empty bounds -- to be built after init"""
-        self.from_year: Optional[int] = None
-        self.to_year: Optional[int] = None
+        self.from_year: int | None = None
+        self.to_year: int | None = None
 
     def __eq__(self, other: object) -> bool:
+        """Check if two YearRanges are equal."""
         return isinstance(other, YearRange) and self.from_year == other.from_year and self.to_year == other.to_year
+
+    def __hash__(self) -> int:
+        """Return hash value of this YearRange value."""
+        return hash((self.from_year, self.to_year))
 
     def parse(self, s: str) -> bool:
         """Parse a plaintext range of years into a pair of years.
@@ -44,6 +55,7 @@ class YearRange:
 
         Returns:
             bool: True if the range was successfully parsed, False if not.
+
         """
         if s == "all":
             self.from_year = None
@@ -73,6 +85,7 @@ class YearRange:
 
         Args:
             t: time to be added to year range.
+
         """
         if self.from_year is None:
             self.from_year = t.year
@@ -94,6 +107,7 @@ class YearRange:
 
         Returns:
             bool: year range contains the time or not.
+
         """
         if self.from_year is None:
             return True
@@ -107,6 +121,7 @@ class YearRange:
 
         Returns:
             int: The number of years in the year range.
+
         """
         if self.from_year is None:
             return 0
@@ -119,6 +134,7 @@ class YearRange:
 
         Yields:
             Generator[int, None, None]: Generator object yielding the years in the year range.
+
         """
         if self.from_year is None:
             return

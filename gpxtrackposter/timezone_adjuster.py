@@ -5,12 +5,17 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import datetime
-from typing import Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pytz
-import s2sphere  # type: ignore
-import timezonefinder  # type: ignore
+import timezonefinder  # type: ignore[import-untyped]
+
+if TYPE_CHECKING:
+    import datetime
+
+    import s2sphere  # type: ignore[import-untyped]
 
 
 class TimezoneAdjuster:
@@ -21,11 +26,13 @@ class TimezoneAdjuster:
 
     Methods:
         adjust: Adjust Timezone if it's not set.
+
     """
 
-    _timezonefinder: Optional[timezonefinder.TimezoneFinder] = None
+    _timezonefinder: timezonefinder.TimezoneFinder | None = None
 
     def __init__(self) -> None:
+        """Initialize the TimezoneAdjuster class."""
         if not TimezoneAdjuster._timezonefinder:
             TimezoneAdjuster._timezonefinder = timezonefinder.TimezoneFinder()
 
@@ -39,6 +46,7 @@ class TimezoneAdjuster:
 
         Returns:
             datetime.datetime: Adjusted time.
+
         """
         # If a timezone is set, there's nothing to do.
         if time.utcoffset():
@@ -47,5 +55,4 @@ class TimezoneAdjuster:
         # if tz_name name is None set it to UTC
         tz_name = cls._timezonefinder.timezone_at(lat=latlng.lat().degrees, lng=latlng.lng().degrees) or "UTC"
         tz = pytz.timezone(tz_name)
-        tz_time = time.astimezone(tz)
-        return tz_time
+        return time.astimezone(tz)

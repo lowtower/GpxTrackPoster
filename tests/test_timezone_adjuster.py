@@ -1,19 +1,18 @@
-"""
-Several tests for TimezoneAdjuster
-"""
+"""Several tests for TimezoneAdjuster"""
 
 # Copyright 2020-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import s2sphere  # type: ignore
+import s2sphere  # type: ignore[import-untyped]
 from dateutil import parser, tz
 
 from gpxtrackposter.timezone_adjuster import TimezoneAdjuster
 
 
 def test_adjust() -> None:
+    """Test adjust timezone"""
     tza = TimezoneAdjuster()
 
     time = parser.parse("2020-09-06T14:34:01.029Z")
@@ -28,6 +27,7 @@ def test_adjust() -> None:
 
 
 def test_adjust_with_utc_returns_time() -> None:
+    """Test adjust timezone with utc returns time"""
     tza = TimezoneAdjuster()
 
     tzinfos = {"CDT": tz.gettz("US/Central")}

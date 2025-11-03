@@ -1,21 +1,20 @@
-"""
-ConfTest
-"""
+"""ConfTest"""
 
 # Copyright 2022-2025 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
+import contextlib
 import datetime
 import os
 from argparse import ArgumentParser, Namespace
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 from unittest.mock import MagicMock
 
 import pytest
-import s2sphere  # type: ignore
+import s2sphere  # type: ignore[import-untyped]
 from pytest_mock import MockerFixture
 
 from gpxtrackposter.calendar_drawer import CalendarDrawer
@@ -32,16 +31,14 @@ from gpxtrackposter.units import Units
 def clear_files_teardown() -> Generator:
     """Session tear down"""
     yield None
-    try:
+    with contextlib.suppress(FileNotFoundError):
         os.remove("logger.log")
-    except FileNotFoundError:
-        pass
 
 
 @pytest.fixture(name="default_values")
 def fixture_default_values() -> Namespace:
     """Return default values as argparse.Namespace"""
-    arguments = Namespace(
+    return Namespace(
         gpx_dir=".",
         output="poster.svg",
         language="",
@@ -69,7 +66,6 @@ def fixture_default_values() -> Namespace:
         workers=None,
         from_strava=None,
     )
-    return arguments
 
 
 @pytest.fixture(name="mock_track_instance")

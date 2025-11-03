@@ -5,23 +5,28 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import argparse
+from __future__ import annotations
+
 import calendar
 import datetime
 import math
-from typing import List, Optional
+from typing import TYPE_CHECKING
 
-import pint  # type: ignore
-import svgwrite  # type: ignore
+import pint  # type: ignore[import-untyped]
+import svgwrite  # type: ignore[import-untyped]
 
 from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError
-from gpxtrackposter.poster import Poster
-from gpxtrackposter.track import Track
 from gpxtrackposter.tracks_drawer import TracksDrawer
 from gpxtrackposter.units import Units
 from gpxtrackposter.value_range import ValueRange
 from gpxtrackposter.xy import XY
+
+if TYPE_CHECKING:
+    import argparse
+
+    from gpxtrackposter.poster import Poster
+    from gpxtrackposter.track import Track
 
 
 class CircularDrawer(TracksDrawer):
@@ -37,16 +42,18 @@ class CircularDrawer(TracksDrawer):
         create_args: Set up an argparser for circular poster options.
         fetch_args: Get args from argparser.
         draw: Draw each year on the Poster.
+
     """
 
     def __init__(self, the_poster: Poster) -> None:
         """Init the CircularDrawer with default values for _rings and _ring_color
 
-        Note that these can be overridden via arguments when calling."""
+        Note that these can be overridden via arguments when calling.
+        """
         super().__init__(the_poster)
         self._rings: bool = False
         self._ring_color: str = "darkgrey"
-        self._max_distance: Optional[pint.Quantity] = None
+        self._max_distance: pint.Quantity | None = None
         self._unit: pint.Unit = Units().km
 
     def create_args(self, args_parser: argparse.ArgumentParser) -> None:
@@ -54,6 +61,7 @@ class CircularDrawer(TracksDrawer):
 
         Args:
             args_parser: Argument parser
+
         """
         group = args_parser.add_argument_group("Circular Type Options")
         group.add_argument(
@@ -84,6 +92,7 @@ class CircularDrawer(TracksDrawer):
 
         Args:
             args: Namespace
+
         """
         self._rings = args.circular_rings
         self._ring_color = args.circular_ring_color
@@ -103,16 +112,19 @@ class CircularDrawer(TracksDrawer):
             g: svg group
             size: Size
             offset: Offset
+
         """
         if len(self.poster.tracks) == 0:
-            raise PosterError("No tracks to draw.")
+            msg = "No tracks to draw."
+            raise PosterError(msg)
         if self.poster.length_range_by_date is None:
             return
 
         years = self.poster.years.count()
         _, counts = utils.compute_grid(years, size)
         if counts is None:
-            raise PosterError("Unable to compute grid.")
+            msg = "Unable to compute grid."
+            raise PosterError(msg)
         count_x, count_y = counts[0], counts[1]
         x, y = 0, 0
         cell_size = size * XY(1 / count_x, 1 / count_y)
@@ -217,15 +229,10 @@ class CircularDrawer(TracksDrawer):
             day += 1
             date += datetime.timedelta(1)
 
-    def _determine_ring_distance(self, max_length: pint.Quantity) -> Optional[pint.Quantity]:
+    def _determine_ring_distance(self, max_length: pint.Quantity) -> pint.Quantity | None:
         ring_distance = None
         distance: None = None  # type: ignore[var-annotated]
-        for distance in [
-            1.0 * self._unit,
-            5.0 * self._unit,
-            10.0 * self._unit,
-            50.0 * self._unit,
-        ]:
+        for distance in [1.0 * self._unit, 5.0 * self._unit, 10.0 * self._unit, 50.0 * self._unit]:
             if max_length < distance:
                 continue
             ring_distance = distance
@@ -243,7 +250,7 @@ class CircularDrawer(TracksDrawer):
         if self._max_distance:
             max_length = self._max_distance
         assert max_length is not None
-        max_length = max_length.to(self._unit)  # type: ignore
+        max_length = max_length.to(self._unit)  # type: ignore[assignment]
         ring_distance = self._determine_ring_distance(max_length)
         if ring_distance is None:
             return
@@ -260,13 +267,13 @@ class CircularDrawer(TracksDrawer):
                     stroke_width=0.3,
                 )
             )
-            distance += ring_distance  # type: ignore
+            distance += ring_distance  # type: ignore[misc]
 
     def _draw_circle_segment(
         self,
         dr: svgwrite.Drawing,
         g: svgwrite.container.Group,
-        tracks: List[Track],
+        tracks: list[Track],
         a1: float,
         a2: float,
         rr: ValueRange,
@@ -279,7 +286,7 @@ class CircularDrawer(TracksDrawer):
         color = self.color(self.poster.length_range_by_date, length, has_special)
         max_length = self.poster.length_range_by_date.upper()
         if self._max_distance:
-            max_length = self._max_distance.to_base_units()  # type: ignore
+            max_length = self._max_distance.to_base_units()  # type: ignore[assignment]
         assert max_length is not None
         r1 = rr.lower()
         assert r1 is not None
