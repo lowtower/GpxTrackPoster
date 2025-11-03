@@ -219,8 +219,12 @@ class CircularDrawer(TracksDrawer):
 
     def _determine_ring_distance(self, max_length: pint.Quantity) -> Optional[pint.Quantity]:
         ring_distance = None
-        # type: ignore[var-annotated]
-        for distance in [1.0 * self._unit, 5.0 * self._unit, 10.0 * self._unit, 50.0 * self._unit]:
+        for distance in [
+            1.0 * self._unit,
+            5.0 * self._unit,
+            10.0 * self._unit,
+            50.0 * self._unit,
+        ]:  # type: ignore[var-annotated]
             if max_length < distance:
                 continue
             ring_distance = distance
