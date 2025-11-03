@@ -11,7 +11,7 @@ import gettext
 import locale
 import logging
 from collections import defaultdict
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pint  # type: ignore[import-untyped]
 import svgwrite  # type: ignore[import-untyped]
@@ -412,7 +412,7 @@ class Poster:
         self,
     ) -> tuple[pint.Quantity, pint.Quantity, QuantityRange, int]:
         length_range = QuantityRange()
-        total_length = 0.0 * Units().meter
+        total_length: Any = 0.0 * Units().meter
         self.total_length_year_dict.clear()
         weeks = {}
         for t in self.tracks:
