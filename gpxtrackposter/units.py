@@ -13,7 +13,7 @@ import pint
 class Units:
     """Unit class."""
 
-    _instance = None
+    _instance: pint.UnitRegistry = None
 
     def __init__(self) -> None:
         """Initialize the Units class."""
