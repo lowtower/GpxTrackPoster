@@ -1,14 +1,15 @@
 """Create a poster from track data."""
+
 # Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-from collections import defaultdict
 import gettext
 import locale
 import logging
 import typing
+from collections import defaultdict
 
 import pint  # type: ignore
 import svgwrite  # type: ignore

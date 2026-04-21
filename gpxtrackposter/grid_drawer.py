@@ -1,4 +1,5 @@
 """Draw a grid poster."""
+
 # Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -8,12 +9,12 @@ import typing
 
 import svgwrite  # type: ignore
 
+from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError
 from gpxtrackposter.poster import Poster
 from gpxtrackposter.track import Track
 from gpxtrackposter.tracks_drawer import TracksDrawer
 from gpxtrackposter.xy import XY
-from gpxtrackposter import utils
 
 
 class GridDrawer(TracksDrawer):

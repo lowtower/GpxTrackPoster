@@ -1,4 +1,5 @@
 """Create and maintain info about a given activity track (corresponding to one GPX file)."""
+
 # Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -11,8 +12,8 @@ import typing
 
 import gpxpy  # type: ignore
 import pint  # type: ignore
-import s2sphere  # type: ignore
 import polyline  # type: ignore
+import s2sphere  # type: ignore
 from stravalib.model import Activity as StravaActivity  # type: ignore
 
 from gpxtrackposter.exceptions import TrackLoadError

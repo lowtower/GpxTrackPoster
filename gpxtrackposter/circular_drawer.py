@@ -1,4 +1,5 @@
 """Draw a circular Poster."""
+
 # Copyright 2016-2023 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
@@ -13,6 +14,7 @@ import typing
 import pint  # type: ignore
 import svgwrite  # type: ignore
 
+from gpxtrackposter import utils
 from gpxtrackposter.exceptions import PosterError
 from gpxtrackposter.poster import Poster
 from gpxtrackposter.track import Track
@@ -20,7 +22,6 @@ from gpxtrackposter.tracks_drawer import TracksDrawer
 from gpxtrackposter.units import Units
 from gpxtrackposter.value_range import ValueRange
 from gpxtrackposter.xy import XY
-from gpxtrackposter import utils
 
 
 class CircularDrawer(TracksDrawer):
