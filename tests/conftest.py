@@ -334,7 +334,7 @@ def fixture_gpx_file_no_permission(tmp_path_factory: pytest.TempPathFactory, gpx
     """Temporary gpx file - no permission"""
     gpx_file_no_permission = tmp_path_factory.mktemp("data") / "gpx_file_no_permission.gpx"
     gpx_file_no_permission.write_text(gpx_file_track_walk_content)
-    os.chmod(gpx_file_no_permission, 0000)
+    os.chmod(gpx_file_no_permission, 0o000)
     return gpx_file_no_permission
 
 

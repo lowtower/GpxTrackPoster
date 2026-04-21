@@ -114,7 +114,7 @@ class Poster:
                 log.warning(
                     "Unable to load translations for %s from %s; falling back to the default translation.",
                     language,
-                    localedir if localedir else "the system's default locale directory",
+                    localedir or "the system's default locale directory",
                 )
         else:
             lang = gettext.NullTranslations()

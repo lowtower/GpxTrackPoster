@@ -316,7 +316,7 @@ def setup_poster(tracks: list[track_loader.Track], args: argparse.Namespace) -> 
     log.info(msg)
     p.set_language(args.language, args.localedir)
     p.set_athlete(args.athlete)
-    p.set_title(args.title if args.title else p.translate("MY TRACKS"))
+    p.set_title(args.title or p.translate("MY TRACKS"))
     p.set_with_animation(args.with_animation)
     p.set_animation_time(args.animation_time)
 
