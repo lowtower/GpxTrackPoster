@@ -100,7 +100,7 @@ class CalendarDrawer(TracksDrawer):
         count_x = 31
         for month in range(1, 13):
             date = datetime.date(year, month, 1)
-            (_, last_day) = calendar.monthrange(year, month)
+            _, last_day = calendar.monthrange(year, month)
             count_x = max(count_x, date.weekday() + last_day)
 
         cell_size = min(size.x / count_x, size.y / 36)
