@@ -200,7 +200,7 @@ class CircularDrawer(TracksDrawer):
             date += datetime.timedelta(1)
 
     def _determine_ring_distance(self, max_length: pint.Quantity) -> typing.Optional[pint.Quantity]:
-        ring_distance = None
+        ring_distance: typing.Optional[pint.Quantity] = None
         for distance in [1.0 * self._unit, 5.0 * self._unit, 10.0 * self._unit, 50.0 * self._unit]:
             if max_length < distance:
                 continue
@@ -223,7 +223,7 @@ class CircularDrawer(TracksDrawer):
         ring_distance = self._determine_ring_distance(max_length)
         if ring_distance is None:
             return
-        distance = ring_distance
+        distance: typing.Optional[pint.Quantity] = ring_distance
         while distance < max_length:
             radius = radius_range.interpolate((distance / max_length).magnitude)
             g.add(

@@ -3,17 +3,17 @@
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
 
-import typing
+from typing import Any, Optional
 
 import pint  # type: ignore
 
 
 class Units:
-    _instance = None
+    _instance: Optional[pint.registry.UnitRegistry] = None
 
     def __init__(self) -> None:
         if not Units._instance:
             Units._instance = pint.UnitRegistry()
 
-    def __getattr__(self, name: str) -> typing.Any:
+    def __getattr__(self, name: str) -> Any:
         return getattr(Units._instance, name)
