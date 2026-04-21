@@ -3,9 +3,10 @@ colour
 geopy
 gpxpy>=1.1.2
 pint>=0.20
+git+https://github.com/lowtower/py-staticmaps.git
 pytz
 s2sphere
 svgwrite>=1.1.9
 stravalib~=0.10
 polyline
-timezonefinder 
+timezonefinder
