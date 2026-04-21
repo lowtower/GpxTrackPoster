@@ -8,7 +8,7 @@ import pytest
 
 from gpxtrackposter.year_range import YearRange
 
-# Copyright 2021-2025 Florian Pigorsch & Contributors. All rights reserved.
+# Copyright 2021-2026 Florian Pigorsch & Contributors. All rights reserved.
 #
 # Use of this source code is governed by a MIT-style
 # license that can be found in the LICENSE file.
