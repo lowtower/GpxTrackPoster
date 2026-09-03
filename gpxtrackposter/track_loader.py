@@ -143,18 +143,24 @@ class TrackLoader:
         """
         self._activity_type = activity_type.lower()
 
-    def load_tracks(self, base_dir: str) -> list[Track]:
+    def load_tracks(self, base_dir: str, load_json: bool = False) -> list[Track]:
         """Load tracks base_dir and return as a List of tracks.
 
         Args:
             base_dir: Base directory with gpx files.
+            load_json: If True, load JSON files instead of GPX files.
 
         Returns:
             list[Track]: A List of tracks.
 
         """
-        file_names = list(self._list_gpx_files(base_dir))
-        log.info("GPX files: %d", len(file_names))
+        if load_json:
+            self.cache_dir = os.path.abspath(base_dir)
+            file_names = list(self._list_json_files(base_dir))
+            log.info("JSON files: %d", len(file_names))
+        else:
+            file_names = list(self._list_gpx_files(base_dir))
+            log.info("GPX files: %d", len(file_names))
 
         tracks: list[Track] = []
 
@@ -162,7 +168,7 @@ class TrackLoader:
         cached_tracks: dict[str, Track] = {}
         if self.cache_dir:
             log.info("Trying to load %d track(s) from cache...", len(file_names))
-            cached_tracks = self._load_tracks_from_cache(file_names)
+            cached_tracks = self._load_tracks_from_cache(file_names, load_json)
             log.info("Loaded tracks from cache: %d", len(cached_tracks))
             tracks = list(cached_tracks.values())
 
@@ -243,7 +249,8 @@ class TrackLoader:
     def _filter_and_merge_tracks(self, tracks: list[Track]) -> list[Track]:
         tracks = self._filter_tracks(tracks)
         # merge tracks that took place within one hour
-        tracks = self._merge_tracks(tracks)
+        # RUNALYZE: we don't want to merge tracks as that may break the 'special' param
+        # tracks = self._merge_tracks(tracks)
         # filter out tracks with length < min_length
         tracks = [t for t in tracks if t.length() >= self._min_length]
         # filter out tracks with wrong activity type
@@ -299,13 +306,13 @@ class TrackLoader:
 
         return tracks
 
-    def _load_tracks_from_cache(self, file_names: list[str]) -> dict[str, Track]:
+    def _load_tracks_from_cache(self, file_names: list[str], load_json: bool = False) -> dict[str, Track]:
         tracks = {}
 
         if self._workers is not None and self._workers <= 1:
             for file_name in file_names:
                 try:
-                    t = load_cached_track_file(self._get_cache_file_name(file_name), file_name)
+                    t = load_cached_track_file(self._get_cache_file_name(file_name, load_json), file_name)
                 except TrackLoadError:
                     log.info("Silently ignore failed cache load attempts.")
                 else:
@@ -392,22 +399,37 @@ class TrackLoader:
             if name.endswith(".gpx") and os.path.isfile(path_name):
                 yield path_name
 
-    def _get_cache_file_name(self, file_name: str) -> str:
+    @staticmethod
+    def _list_json_files(base_dir: str) -> Generator[str, None, None]:
+        base_dir = os.path.abspath(base_dir)
+        if not os.path.isdir(base_dir):
+            msg = f"Not a directory: {base_dir}"
+            raise ParameterError(msg)
+        for name in os.listdir(base_dir):
+            path_name = os.path.join(base_dir, name)
+            if name.endswith(".json") and os.path.isfile(path_name):
+                yield path_name
+
+    def _get_cache_file_name(self, file_name: str, load_json: bool = False) -> str:
         assert self.cache_dir
 
         if file_name in self._cache_file_names:
             return self._cache_file_names[file_name]
 
-        try:
-            with open(file_name, "rb") as file:
-                checksum = hashlib.sha256(file.read()).hexdigest()
-        except PermissionError as e:
-            msg = "Failed to compute checksum (bad permissions)."
-            raise TrackLoadError(msg) from e
-        except Exception as e:
-            msg = "Failed to compute checksum."
-            raise TrackLoadError(msg) from e
+        if load_json:
+            cache_file_name = os.path.join(self.cache_dir, file_name)
+        else:
+            try:
+                with open(file_name, "rb") as file:
+                    checksum = hashlib.sha256(file.read()).hexdigest()
+            except PermissionError as e:
+                msg = "Failed to compute checksum (bad permissions)."
+                raise TrackLoadError(msg) from e
+            except Exception as e:
+                msg = "Failed to compute checksum."
+                raise TrackLoadError(msg) from e
 
-        cache_file_name = os.path.join(self.cache_dir, f"{checksum}.json")
+            cache_file_name = os.path.join(self.cache_dir, f"{checksum}.json")
+
         self._cache_file_names[file_name] = cache_file_name
         return cache_file_name

@@ -81,6 +81,7 @@ class Poster:
             "special": "#FFFF00",
             "track": "#4DD2FF",
         }
+        self.statistics = {"label": "Activities", "num": 0, "total": 0.0, "min": 0.0, "max": 0.0}
         self.special_distance: dict[str, float] = {"special_distance1": 10, "special_distance2": 20}
         self.width: int = 200
         self.height: int = 300
@@ -323,9 +324,10 @@ class Poster:
             total_length,
             average_length,
             length_range,
-            weeks,
+            _weeks,
         ) = self._compute_track_statistics()
 
+        # RUNALYZE: slightly different styling
         g.add(
             d.text(
                 self.translate("ATHLETE"),
@@ -350,23 +352,24 @@ class Poster:
                 style=header_style,
             )
         )
-        g.add(
-            d.text(
-                self.translate("Number") + f": {len(self.tracks)}",
-                insert=(120, self.height - 15),
-                fill=text_color,
-                style=small_value_style,
-            )
-        )
-        weekly = len(self.tracks) / weeks if weeks else 0.0
-        g.add(
-            d.text(
-                self.translate("Weekly") + ": " + format_float(weekly),
-                insert=(120, self.height - 10),
-                fill=text_color,
-                style=small_value_style,
-            )
-        )
+        # RUNALYZE: don't add weekly, as statistics do not match the calculated 'weeks' number
+        # g.add(
+        #     d.text(
+        #         self.translate("Number") + f": {len(self.tracks)}",
+        #         insert=(120, self.height - 15),
+        #         fill=text_color,
+        #         style=small_value_style,
+        #     )
+        # )
+        # weekly = len(self.tracks) / weeks if weeks else 0.0
+        # g.add(
+        #     d.text(
+        #         self.translate("Weekly") + ": " + format_float(weekly),
+        #         insert=(120, self.height - 10),
+        #         fill=text_color,
+        #         style=small_value_style,
+        #     )
+        # )
         g.add(
             d.text(
                 self.translate("Total") + ": " + self.format_distance(total_length),
@@ -422,6 +425,25 @@ class Poster:
             # time.isocalendar()[1] -> week number
             weeks[(t.start_time().year, t.start_time().isocalendar()[1])] = 1
         average_length = total_length / len(self.tracks) if self.tracks else 0.0 * Units().meter
+
+        if length_range.is_valid():
+            min_length = length_range.lower()
+            max_length = length_range.upper()
+            assert min_length is not None
+            assert max_length is not None
+        else:
+            min_length = pint.Quantity(0.0, "meter")
+            max_length = pint.Quantity(0.0, "meter")
+
+        # RUNALYZE: we need a statistics object to save those numbers to be able to get them from args
+        self.statistics["num"] = len(self.tracks) if self.statistics["num"] == 0 else self.statistics["num"]
+        self.statistics["total"] = (
+            total_length if self.statistics["total"] == 0 else self.statistics["total"] * Units().km
+        )
+        self.statistics["min"] = min_length if self.statistics["min"] == 0 else self.statistics["min"] * Units().km
+        self.statistics["max"] = max_length if self.statistics["max"] == 0 else self.statistics["max"] * Units().km
+        self.statistics["weeks"] = len(weeks)
+
         return (
             total_length,
             average_length,

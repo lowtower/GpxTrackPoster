@@ -203,11 +203,15 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
     "PLC0415",  # import-outside-top-level
     "TD",  # TODO
 ]
+"gpxtrackposter/poster.py" = [
+    "ERA001",  # commented-out-code
+]
 "gpxtrackposter/track.py" = [
     "TRY301",  # raise-within-try
 ]
 "gpxtrackposter/track_loader.py" = [
     "BLE001",  # blind-except
+    "ERA001",  # commented-out-code
     "PERF203",  # try-except-in-loop
 ]
 "docs/gen_ref_pages.py" = [

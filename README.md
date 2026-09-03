@@ -46,7 +46,7 @@ Only you need is change the strava config
 [How to get strava config](https://developers.strava.com/docs/getting-started/)
 
 ```
-usage: create_poster [-h] [--gpx-dir DIR] [--output FILE]
+usage: create_poster [-h] [--gpx-dir DIR] [--json-dir DIR] [--output FILE]
                      [--language LANGUAGE] [--localedir DIR] [--year YEAR]
                      [--title TITLE] [--athlete NAME] [--special FILE]
                      [--type TYPE] [--background-color COLOR]
@@ -59,6 +59,8 @@ usage: create_poster [-h] [--gpx-dir DIR] [--output FILE]
                      [--special-distance2 DISTANCE] [--min-distance DISTANCE]
                      [--activity-type ACTIVITY_TYPE] [--with-animation]
                      [--animation-time ANIMATION_TIME]
+                     [--stat-num NUMBER] [--stat-total KM]
+                     [--stat-min KM] [--stat-max KM]
                      [--heatmap-center LAT,LNG] [--heatmap-radius RADIUS_KM]
                      [--heatmap-line-transparency-width TRANSP_1,WIDTH_1, TRANSP_2,WIDTH_2, TRANSP_3,WIDTH_3]
                      [--heatmap-tile-provider TILE_PROVIDER]
@@ -72,6 +74,7 @@ options:
   -h, --help            show this help message and exit
   --gpx-dir DIR         Directory containing GPX files (default: current
                         directory).
+  --json-dir DIR        Directory containing JSON files (default: none).
   --output FILE         Name of generated SVG image file (default:
                         "poster.svg").
   --language LANGUAGE   Language (default: english).
@@ -118,6 +121,10 @@ options:
   --with-animation      add animation to the poster
   --animation-time ANIMATION_TIME
                         animation duration (default: 30s)
+  --stat-num NUMBER     Statistics: number of activities
+  --stat-total KM       Statistics: total distance
+  --stat-min KM         Statistics: minimal distance
+  --stat-max KM         Statistics: maximal distance
 
 Heatmap Type Options:
   --heatmap-center LAT,LNG
@@ -131,9 +138,10 @@ Heatmap Type Options:
                         calculation (default: 0.1,5.0, 0.2,2.0, 1.0,0.3).
   --heatmap-tile-provider TILE_PROVIDER
                         Optionally, choose a tile provider from the list for a
-                        background map image: osm, stamen-terrain, stamen-
-                        toner, stamen-toner-lite, arcgis-worldimagery, carto-
-                        nolabels, carto-darknolabels, none. (Default: None)
+                        background map image: arcgis-worldimagery, carto,
+                        carto-nolabels, carto-dark, carto-darknolabels, osm,
+                        stadia-alidade-smooth, jawg-light, jawg-dark, none.
+                        (Default: None)
   --heatmap-tile-max-size PIXEL
                         Set the maximum background image size (which is
                         afterwards scaled to the poster size). This setting
