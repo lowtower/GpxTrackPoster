@@ -63,7 +63,12 @@ def main() -> None:
     loader = setup_loader(args)
 
     # setup tracks
-    tracks = loader.load_strava_tracks(args.from_strava) if args.from_strava else loader.load_tracks(args.gpx_dir)
+    if args.from_strava:
+        tracks = loader.load_strava_tracks(args.from_strava)
+    elif args.json_dir:
+        tracks = loader.load_tracks(args.json_dir, load_json=True)
+    else:
+        tracks = loader.load_tracks(args.gpx_dir)
     if not tracks:
         if not args.clear_cache:
             log = logging.getLogger("gpxtrackposter")
@@ -106,6 +111,14 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default=".",
         help="Directory containing GPX files (default: current directory).",
+    )
+    args_parser.add_argument(
+        "--json-dir",
+        dest="json_dir",
+        metavar="DIR",
+        type=str,
+        default="",
+        help="Directory containing JSON files (default: none).",
     )
     args_parser.add_argument(
         "--output",
@@ -278,6 +291,18 @@ def create_parser() -> argparse.ArgumentParser:
         default=30,
         help="animation duration (default: 30s)",
     )
+    args_parser.add_argument(
+        "--stat-num", dest="stat_num", metavar="NUMBER", type=int, default=0, help="Statistics: number of activities"
+    )
+    args_parser.add_argument(
+        "--stat-total", dest="stat_total", metavar="KM", type=float, default=0.0, help="Statistics: total distance"
+    )
+    args_parser.add_argument(
+        "--stat-min", dest="stat_min", metavar="KM", type=float, default=0.0, help="Statistics: minimal distance"
+    )
+    args_parser.add_argument(
+        "--stat-max", dest="stat_max", metavar="KM", type=float, default=0.0, help="Statistics: maximal distance"
+    )
     return args_parser
 
 
@@ -337,6 +362,14 @@ def setup_poster(tracks: list[track_loader.Track], args: argparse.Namespace) -> 
     p.set_tracks(tracks)
     if args.type == "github":
         p.height = 55 + p.years.count() * 43
+
+    p.statistics = {
+        "num": args.stat_num if hasattr(args, "stat_num") else len(tracks),
+        "total": args.stat_total if hasattr(args, "stat_total") else 0.0,
+        "min": args.stat_min if hasattr(args, "stat_min") else 0.0,
+        "max": args.stat_max if hasattr(args, "stat_max") else 0.0,
+    }
+
     return p
 
 
