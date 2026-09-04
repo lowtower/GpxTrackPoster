@@ -32,11 +32,11 @@ __app_author__ = "flopp.net"
 
 p = poster.Poster()
 drawers = {
-    "grid": grid_drawer.GridDrawer(p),
     "calendar": calendar_drawer.CalendarDrawer(p),
-    "heatmap": heatmap_drawer.HeatmapDrawer(p),
     "circular": circular_drawer.CircularDrawer(p),
     "github": github_drawer.GithubDrawer(p),
+    "grid": grid_drawer.GridDrawer(p),
+    "heatmap": heatmap_drawer.HeatmapDrawer(p),
 }
 
 
@@ -111,14 +111,6 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default=".",
         help="Directory containing GPX files (default: current directory).",
-    )
-    args_parser.add_argument(
-        "--json-dir",
-        dest="json_dir",
-        metavar="DIR",
-        type=str,
-        default="",
-        help="Directory containing JSON files (default: none).",
     )
     args_parser.add_argument(
         "--output",
@@ -291,16 +283,25 @@ def create_parser() -> argparse.ArgumentParser:
         default=30,
         help="animation duration (default: 30s)",
     )
-    args_parser.add_argument(
+    group = args_parser.add_argument_group("Runalyze specific Options")
+    group.add_argument(
+        "--json-dir",
+        dest="json_dir",
+        metavar="DIR",
+        type=str,
+        default="",
+        help="Directory containing JSON files (default: none).",
+    )
+    group.add_argument(
         "--stat-num", dest="stat_num", metavar="NUMBER", type=int, default=0, help="Statistics: number of activities"
     )
-    args_parser.add_argument(
+    group.add_argument(
         "--stat-total", dest="stat_total", metavar="KM", type=float, default=0.0, help="Statistics: total distance"
     )
-    args_parser.add_argument(
+    group.add_argument(
         "--stat-min", dest="stat_min", metavar="KM", type=float, default=0.0, help="Statistics: minimal distance"
     )
-    args_parser.add_argument(
+    group.add_argument(
         "--stat-max", dest="stat_max", metavar="KM", type=float, default=0.0, help="Statistics: maximal distance"
     )
     return args_parser

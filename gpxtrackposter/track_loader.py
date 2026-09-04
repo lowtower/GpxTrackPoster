@@ -321,8 +321,10 @@ class TrackLoader:
 
         with concurrent.futures.ProcessPoolExecutor(max_workers=self._workers) as executor:
             future_to_file_name = {
-                executor.submit(load_cached_track_file, self._get_cache_file_name(file_name), file_name): file_name
-                for file_name in file_names
+                executor.submit(
+                    load_cached_track_file,
+                    self._get_cache_file_name(file_name, load_json),
+                    file_name): file_name for file_name in file_names
             }
         for future in concurrent.futures.as_completed(future_to_file_name):
             file_name = future_to_file_name[future]
