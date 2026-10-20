@@ -128,7 +128,10 @@ def fixture_poster() -> Poster:
         "track2": poster.colors["track"],
         "special2": poster.colors["special"],
     }
-    poster.special_distance = {"special_distance": 10.0 * Units().km, "special_distance2": 20.0 * Units().km}
+    poster.special_distance = {
+        "special_distance": 10.0 * Units().km,  # type: ignore[dict-item]
+        "special_distance2": 20.0 * Units().km,  # type: ignore[dict-item]
+    }
     poster.width = 200
     poster.height = 300
     poster.tracks_drawer = None

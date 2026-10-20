@@ -148,7 +148,7 @@ class QuantityRange:
             raise ValueError(msg)
         assert self._lower is not None
         assert self._upper is not None
-        return self._lower + relative * (self._upper - self._lower)
+        return self._lower + relative * (self._upper - self._lower)  # type: ignore[return-value]
 
     def relative_position(self, value: pint.Quantity) -> float:
         """Get the relative position of the given value within the quantity range.
@@ -172,7 +172,7 @@ class QuantityRange:
             return 0.0
         if value >= self._upper:
             return 1.0
-        diff = self._upper - self._lower
+        diff: pint.Quantity = self._upper - self._lower
         if diff == 0:
             return 0.0
         return ((value - self._lower) / diff).magnitude
