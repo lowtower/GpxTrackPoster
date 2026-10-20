@@ -1,5 +1,7 @@
 """Generate the code reference pages and navigation."""
 
+# Copyright 2016-2026 Florian Pigorsch & Contributors. All rights reserved.
+
 from pathlib import Path
 
 import mkdocs_gen_files
