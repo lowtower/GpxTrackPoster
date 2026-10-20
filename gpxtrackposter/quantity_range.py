@@ -172,7 +172,7 @@ class QuantityRange:
             return 0.0
         if value >= self._upper:
             return 1.0
-        diff = self._upper - self._lower
+        diff: pint.Quantity = self._upper - self._lower
         if diff == 0:
             return 0.0
         return ((value - self._lower) / diff).magnitude
